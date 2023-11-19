@@ -72,15 +72,15 @@ int	main(void)
 			if (vect_fds[i].fd == fd_sock_listen && vect_fds[i].revents & POLLIN) // listener port
 			{
 				fd_sock_client = accept(fd_sock_listen, (sockaddr *) &addr_client, &len_addr_client);
-				fcntl(fd_sock_client, F_SETFL, O_NONBLOCK);
-				std::cout << "Client connected : " << inet_ntoa(addr_client.sin_addr) << ":"
-					<< ntohs(addr_client.sin_port) << std::endl;
 				if (fd_sock_client == -1)
 					perror("Connection");
 				else
 				{
 					int	size_buf;
 
+					fcntl(fd_sock_client, F_SETFL, O_NONBLOCK);
+					std::cout << "Client connected : " << inet_ntoa(addr_client.sin_addr) << ":"
+						<< ntohs(addr_client.sin_port) << std::endl;
 					size_buf = SEND_BUFFER_SIZE;
 					setsockopt(fd_sock_client, IPPROTO_TCP, SO_SNDBUF, &size_buf, sizeof(size_buf));
 					size_buf = RECV_BUFFER_SIZE;
