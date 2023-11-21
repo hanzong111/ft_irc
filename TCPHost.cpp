@@ -2,14 +2,15 @@
 #include <unistd.h>
 #include <cstring>
 #include <string>
+#include <cerrno>
 #include <iostream>
 #include <arpa/inet.h>
 
 TCPHost::TCPHost() :
 	fd(-1),
-	addr({0}),
 	addr_len(sizeof(addr))
 {
+	memset(&addr, 0, sizeof(addr));
 	addr.sin_family = AF_INET;
 }
 
@@ -52,6 +53,11 @@ TCPHost &TCPHost::operator=(const TCPHost &other)
 
 TCPHost::~TCPHost()
 {}
+
+int	TCPHost::getFd() const throw()
+{
+	return (fd);
+}
 
 uint16_t	TCPHost::getPortNumN() const throw()
 {
