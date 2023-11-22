@@ -131,6 +131,20 @@ void	TCPServer::addClient(TCPClientConn &client)
 		updatePollfdStruct();
 }
 
+void	TCPServer::removeClient(TCPClientConn &client)
+{
+	for (std::vector<TCPClientConn>::iterator it = clients.begin(); it < clients.end(); it++)
+	{
+		if (&(*it) == &client)
+		{
+			clients.erase(it);
+			pollfd_vect.erase(pollfd_vect.begin());
+			updatePollfdStruct();
+			break ;
+		}
+	}
+}
+
 void	TCPServer::pollEvents(int timeout)
 {
 	n_events = poll(pollfd_vect.data(), pollfd_vect.size(), timeout);

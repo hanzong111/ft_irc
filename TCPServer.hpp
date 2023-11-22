@@ -18,6 +18,7 @@ class TCPServer : virtual public TCPHost
 		int				startListening();
 		void			acceptConnReq();
 		void			addClient(TCPClientConn &client);
+		void			removeClient(TCPClientConn &client);
 		void			pollEvents(int timeout);
 		virtual void	handleEvents() = 0;
 

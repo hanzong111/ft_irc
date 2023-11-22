@@ -102,9 +102,10 @@ size_t	TestServer::handlePollIn(size_t ind)
 	{
 		std::cout << "Client (" << clients[ind].getIPAddrStr() << ":"
 			<< clients[ind].getPortNumH() << ") disconnected" << std::endl;
-		clients.erase(clients.begin() + ind);
-		pollfd_vect.erase(pollfd_vect.begin() + 1 + ind);
-		updatePollfdStruct();
+		// clients.erase(clients.begin() + ind);
+		// pollfd_vect.erase(pollfd_vect.begin() + 1 + ind);
+		// updatePollfdStruct();
+		removeClient(clients[ind]);
 		return (ind - 1);
 	}
 	return (ind);
