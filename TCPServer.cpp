@@ -1,5 +1,5 @@
 #include "TCPServer.hpp"
-#include "TCPClient.hpp"
+#include "TCPClientConn.hpp"
 #include "TCPHost.hpp"
 #include <unistd.h>
 #include <poll.h>
@@ -94,7 +94,7 @@ void	TCPServer::acceptConnReq()
 {
 	try
 	{
-		TCPClient	client(*this);
+		TCPClientConn	client(*this);
 
 		addClient(client);
 		std::cout << "Client (" << clients.back().getIPAddrStr() << ":"
@@ -107,7 +107,7 @@ void	TCPServer::acceptConnReq()
 	}
 }
 
-void	TCPServer::addClient(TCPClient &client)
+void	TCPServer::addClient(TCPClientConn &client)
 {
 	pollfd	tmp;
 	bool need_update_pollfd_ptr = false;

@@ -1,6 +1,6 @@
 #include "TestServer.hpp"
 #include "TCPServer.hpp"
-#include "TCPClient.hpp"
+#include "TCPClientConn.hpp"
 #include <unistd.h>
 #include <poll.h>
 #include <netinet/in.h>
@@ -92,7 +92,7 @@ size_t	TestServer::handlePollIn(size_t ind)
 	{
 		char	buf[n_bytes_recv];
 		clients[ind].retrieveRecvBuf(buf, NULL);
-		for (std::vector<TCPClient>::iterator it = clients.begin(); it < clients.end(); it++)
+		for (std::vector<TCPClientConn>::iterator it = clients.begin(); it < clients.end(); it++)
 		{
 			if (it != clients.begin() + ind)
 				it->queueSend(buf, n_bytes_recv);

@@ -11,13 +11,13 @@
 
 class TCPServer;
 
-class TCPClient : virtual public TCPHost
+class TCPClientConn : virtual public TCPHost
 {
 	public:
-		TCPClient(const TCPServer &server);
-		TCPClient(const TCPClient &other);
-		TCPClient &operator=(const TCPClient &other);
-		virtual ~TCPClient();
+		TCPClientConn(const TCPServer &server);
+		TCPClientConn(const TCPClientConn &other);
+		TCPClientConn &operator=(const TCPClientConn &other);
+		virtual ~TCPClientConn();
 
 		ssize_t		sendBytes(const void *buf, size_t n, int flags) const;		
 		ssize_t		recvBytes(void *buf, size_t n, int flags) const;
@@ -41,7 +41,7 @@ class TCPClient : virtual public TCPHost
 		std::queue< std::pair<char *, size_t> >	send_queue;
 
 	private:
-		TCPClient();
+		TCPClientConn();
 	
 	//friend class TCPServer;
 };
