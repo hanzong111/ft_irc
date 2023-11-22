@@ -35,12 +35,18 @@ TCPClientConn::TCPClientConn(const TCPServer &server) :
 	pollfd_struct = NULL;
 }
 
+/**
+ * @note Copies will share the same pollfd struct, and sending may not work 
+ * correctly since the copies will all have separate send_queue and the POLLOUT 
+ * bit in the `event` field of the pollfd struct will be cleared after a copy 
+ * has completed its send. 
+*/
 TCPClientConn::TCPClientConn(const TCPClientConn &other) :
 	TCPHost()
 {
 	recv_buf = NULL;
 	recv_buf_size = 0;
-	pollfd_struct = NULL;
+	pollfd_struct = other.pollfd_struct;
 	*this = other;
 }
 
@@ -69,10 +75,11 @@ TCPClientConn &TCPClientConn::operator=(const TCPClientConn &other)
 	recv_data_size = other.recv_data_size;
 	recv_retrieve_size = other.recv_retrieve_size;
 	partial_receive = other.partial_receive;
-	if (other.pollfd_struct != NULL && pollfd_struct != NULL)
+	if (pollfd_struct != NULL && other.pollfd_struct != pollfd_struct)
+	{
 		memcpy(pollfd_struct, other.pollfd_struct, sizeof(*pollfd_struct));
-	if (pollfd_struct != NULL)
 		pollfd_struct->fd = fd;
+	}
 
 	// Delete data in send_queue
 	while (!send_queue.empty())
