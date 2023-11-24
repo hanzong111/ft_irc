@@ -15,8 +15,14 @@ TCPServer::TCPServer(const std::string &ip_addr, uint16_t port_num) :
 	TCPHost(),
 	n_events(0)
 {
-	pollfd_struct = NULL;
+	pollfd tmp;
+	
 	createTCPSocket();
+	tmp.fd = fd;
+	tmp.events = POLLIN;
+	tmp.revents = 0;
+	pollfd_vect.push_back(tmp);
+	pollfd_struct = &pollfd_vect.front();
 	bindToInterface(ip_addr, port_num);
 }
 
@@ -24,7 +30,14 @@ TCPServer::TCPServer(const TCPServer &other) :
 	TCPHost(),
 	n_events(0)
 {
-	pollfd_struct = NULL;
+	pollfd	tmp;
+
+	tmp.fd = -1;
+	tmp.events = POLLIN;
+	tmp.revents = 0;
+	pollfd_vect.push_back(tmp);
+	// pollfd_vect was empty, so `tmp` must be at the front.
+	pollfd_struct = &pollfd_vect.front();
 	*this = other;
 }
 
@@ -41,7 +54,11 @@ TCPServer &TCPServer::operator=(const TCPServer &other)
 	addr_len = other.addr_len;
 	pollfd_vect = other.pollfd_vect;
 	clients = other.clients;
-	memcpy(pollfd_struct, other.pollfd_struct, sizeof(*pollfd_struct));
+	if (pollfd_struct != NULL && pollfd_struct != other.pollfd_struct)
+	{
+		memcpy(pollfd_struct, other.pollfd_struct, sizeof(*pollfd_struct));
+		pollfd_struct->fd = fd;
+	}
 	n_events = other.n_events;
 	return (*this);
 }
@@ -83,12 +100,6 @@ int	TCPServer::startListening()
 		throw std::range_error("startListening: Invalid fd");
 	else if (listen(fd, SOMAXCONN) == -1)
 		throw std::runtime_error("listen: " + std::string(std::strerror(errno)));
-	pollfd tmp;
-	tmp.fd = fd;
-	tmp.events = POLLIN;
-	tmp.revents = 0;
-	pollfd_vect.push_back(tmp);
-	pollfd_struct = &pollfd_vect.back();
 	return (0);
 }
 
