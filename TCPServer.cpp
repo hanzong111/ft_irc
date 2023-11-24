@@ -2,6 +2,7 @@
 #include "TCPClientConn.hpp"
 #include "TCPHost.hpp"
 #include <unistd.h>
+#include <fcntl.h>
 #include <poll.h>
 #include <cstring>
 #include <string>
@@ -55,7 +56,8 @@ int	TCPServer::createTCPSocket()
 {
 	if (fd != -1 && close(fd) == -1)
 		std::cerr << "Warning: Failed to close socket" << std::endl;
-	fd = socket(AF_INET, SOCK_STREAM | SOCK_NONBLOCK, 0);
+	fd = socket(AF_INET, SOCK_STREAM, 0);
+	fcntl(fd, F_SETFL, O_NONBLOCK);
 	if (fd == -1)
 		throw std::runtime_error("socket: " + std::string(std::strerror(errno)));
 	return (fd);
