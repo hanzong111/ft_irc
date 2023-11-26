@@ -7,7 +7,7 @@
 # include <string>
 # include <vector>
 
-class TCPClientConn;
+class TCPConn;
 
 class TCPServer : virtual public TCPHost
 {
@@ -17,8 +17,8 @@ class TCPServer : virtual public TCPHost
 
 		int				startListening();
 		void			acceptConnReq();
-		void			addClient(TCPClientConn &client);
-		void			removeClient(TCPClientConn &client);
+		void			addClient(TCPConn &client);
+		void			removeClient(TCPConn &client);
 		void			pollEvents(int timeout);
 		virtual void	handleEvents() = 0;
 
@@ -32,7 +32,7 @@ class TCPServer : virtual public TCPHost
 		void	updatePollfdStruct();
 		
 		std::vector<pollfd>		pollfd_vect;
-		std::vector<TCPClientConn>	clients;
+		std::vector<TCPConn>	clients;
 		pollfd					*pollfd_struct;
 		int						n_events;
 };

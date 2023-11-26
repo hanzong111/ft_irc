@@ -1,5 +1,5 @@
-#ifndef FT_IRC_TCPCLIENT_HPP
-# define FT_IRC_TCPCLIENT_HPP
+#ifndef FT_IRC_TCPCONN_HPP
+# define FT_IRC_TCPCONN_HPP
 
 # include "TCPHost.hpp"
 # include <poll.h>
@@ -11,13 +11,13 @@
 
 class TCPServer;
 
-class TCPClientConn : virtual public TCPHost
+class TCPConn : virtual public TCPHost
 {
 	public:
-		TCPClientConn(const TCPServer &server);
-		TCPClientConn(const TCPClientConn &other);
-		TCPClientConn &operator=(const TCPClientConn &other);
-		virtual ~TCPClientConn();
+		TCPConn(const TCPServer &server);
+		TCPConn(const TCPConn &other);
+		TCPConn &operator=(const TCPConn &other);
+		virtual ~TCPConn();
 
 		ssize_t		sendBytes(const void *buf, size_t n, int flags) const;		
 		ssize_t		recvBytes(void *buf, size_t n, int flags) const;
@@ -41,7 +41,7 @@ class TCPClientConn : virtual public TCPHost
 		std::queue< std::pair<char *, size_t> >	send_queue;
 
 	private:
-		TCPClientConn();
+		TCPConn();
 	
 	//friend class TCPServer;
 };

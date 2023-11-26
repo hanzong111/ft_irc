@@ -1,4 +1,4 @@
-#include "TCPClientConn.hpp"
+#include "TCPConn.hpp"
 #include "TCPHost.hpp"
 #include "TCPServer.hpp"
 #include <unistd.h>
@@ -10,7 +10,7 @@
 #include <iostream>
 #include <netinet/in.h>
 
-TCPClientConn::TCPClientConn() :
+TCPConn::TCPConn() :
 	TCPHost()
 {
 	recv_buf = new char[TCPSERVER_INIT_BUF_SIZE];
@@ -21,7 +21,7 @@ TCPClientConn::TCPClientConn() :
 	pollfd_struct = NULL;
 }
 
-TCPClientConn::TCPClientConn(const TCPServer &server) :
+TCPConn::TCPConn(const TCPServer &server) :
 	TCPHost()
 {
 	fd = accept(server.getFd(), (sockaddr *) &addr, &addr_len);
@@ -41,7 +41,7 @@ TCPClientConn::TCPClientConn(const TCPServer &server) :
  * bit in the `event` field of the pollfd struct will be cleared after a copy 
  * has completed its send. 
 */
-TCPClientConn::TCPClientConn(const TCPClientConn &other) :
+TCPConn::TCPConn(const TCPConn &other) :
 	TCPHost()
 {
 	recv_buf = NULL;
@@ -50,7 +50,7 @@ TCPClientConn::TCPClientConn(const TCPClientConn &other) :
 	*this = other;
 }
 
-TCPClientConn &TCPClientConn::operator=(const TCPClientConn &other)
+TCPConn &TCPConn::operator=(const TCPConn &other)
 {
 	if (this == &other)
 		return (*this);
@@ -100,7 +100,7 @@ TCPClientConn &TCPClientConn::operator=(const TCPClientConn &other)
 	return (*this);
 }
 
-TCPClientConn::~TCPClientConn()
+TCPConn::~TCPConn()
 {
 	delete[] recv_buf;
 	// Delete data in send_queue
@@ -120,7 +120,7 @@ TCPClientConn::~TCPClientConn()
 /**
  * @brief A simple wrapper for `send()`.
  */
-ssize_t	TCPClientConn::sendBytes(const void* buf, size_t n, int flags) const
+ssize_t	TCPConn::sendBytes(const void* buf, size_t n, int flags) const
 {
 	return(send(fd, buf, n, flags));
 }
@@ -128,7 +128,7 @@ ssize_t	TCPClientConn::sendBytes(const void* buf, size_t n, int flags) const
 /**
  * @brief A simple wrapper for `recv()`.
  */
-ssize_t		TCPClientConn::recvBytes(void *buf, size_t n, int flags) const
+ssize_t		TCPConn::recvBytes(void *buf, size_t n, int flags) const
 {
 	return (recv(fd, buf, n, flags));
 }
@@ -148,7 +148,7 @@ ssize_t		TCPClientConn::recvBytes(void *buf, size_t n, int flags) const
  *	   The allocated memory will be freed when the data is sent or when the TCP
  *	   client object is destroyed, ensuring proper cleanup.  
  */
-void	TCPClientConn::queueSend(const void *buf, size_t n)
+void	TCPConn::queueSend(const void *buf, size_t n)
 {
 	char	*new_buf;
 
@@ -173,7 +173,7 @@ void	TCPClientConn::queueSend(const void *buf, size_t n)
  * queue. If the operation is not completed, the caller is expected to call this function
  * again in the future to complete the operation (until a positive value is returned).
  */
-ssize_t	TCPClientConn::processSendQueue(int flags)
+ssize_t	TCPConn::processSendQueue(int flags)
 {
 	size_t	total_bytes_sent = 0;
 	ssize_t	n_bytes_sent = 0;
@@ -226,9 +226,9 @@ ssize_t	TCPClientConn::processSendQueue(int flags)
  *         Returns -1 if the remote side has closed the connection (graceful shutdown).
  *         Returns 0 if the delimiter is not found (partial receive) or in case of recv() errors.
  *
- * @note The caller should use TCPClientConn::retrieveRecvBuffer to access the received data.
+ * @note The caller should use TCPConn::retrieveRecvBuffer to access the received data.
  */
-ssize_t TCPClientConn::requestRecv(const char* delimiter, size_t delimiter_size, int flags)
+ssize_t TCPConn::requestRecv(const char* delimiter, size_t delimiter_size, int flags)
 {
 	if (!(pollfd_struct->revents & POLLIN))
 		return (0);
@@ -283,10 +283,10 @@ ssize_t TCPClientConn::requestRecv(const char* delimiter, size_t delimiter_size,
  * This function returns a pointer to the receive buffer and its size to the caller,
  * copying the data to the specified external buffer. The internal buffer is updated to
  * remove the data that has been copied. The operation can only be performed if
- * partial receive has not occurred (previous call to TCPClientConn::requestRecv must have 
+ * partial receive has not occurred (previous call to TCPConn::requestRecv must have 
  * returned a positive value). The caller is responsible to ensure that the external
  * buffer is large enough to hold the copied data, the size of which is returned by
- * previous call to TCPClientConn::requestRecv.
+ * previous call to TCPConn::requestRecv.
  *
  * @param[out] buffer Pointer to the external buffer to copy the data into.
  * @param[out] size Pointer to a size_t, which will be set to the size of data copied
@@ -294,7 +294,7 @@ ssize_t TCPClientConn::requestRecv(const char* delimiter, size_t delimiter_size,
  * @return true if the operation is successful
  *         false if partial receive has occurred or the internal buffer is empty.
  */
-bool TCPClientConn::retrieveRecvBuf(char *buffer, size_t *size)
+bool TCPConn::retrieveRecvBuf(char *buffer, size_t *size)
 {
     if (buffer == NULL || partial_receive || recv_data_size == 0) {
         return (false);
@@ -318,27 +318,27 @@ bool TCPClientConn::retrieveRecvBuf(char *buffer, size_t *size)
     return (true);
 }
 
-short	TCPClientConn::getPollREvents() const throw()
+short	TCPConn::getPollREvents() const throw()
 {
 	return (pollfd_struct->revents);
 }
 
-void	TCPClientConn::setPollREvents(short revents) throw()
+void	TCPConn::setPollREvents(short revents) throw()
 {
 	pollfd_struct->revents = revents;
 }
 
-short	TCPClientConn::getPollEvents() const throw()
+short	TCPConn::getPollEvents() const throw()
 {
 	return (pollfd_struct->events);
 }
 
-void	TCPClientConn::setPollEvents(short events) throw()
+void	TCPConn::setPollEvents(short events) throw()
 {
 	pollfd_struct->events = events;
 }
 
-void	TCPClientConn::setPollFdPtr(pollfd *ptr) throw()
+void	TCPConn::setPollFdPtr(pollfd *ptr) throw()
 {
 	pollfd_struct = ptr;
 }

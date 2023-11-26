@@ -1,5 +1,5 @@
 #include "TCPServer.hpp"
-#include "TCPClientConn.hpp"
+#include "TCPConn.hpp"
 #include "TCPHost.hpp"
 #include <unistd.h>
 #include <fcntl.h>
@@ -107,7 +107,7 @@ void	TCPServer::acceptConnReq()
 {
 	try
 	{
-		TCPClientConn	client(*this);
+		TCPConn	client(*this);
 
 		addClient(client);
 		std::cout << "Client (" << clients.back().getIPAddrStr() << ":"
@@ -120,7 +120,7 @@ void	TCPServer::acceptConnReq()
 	}
 }
 
-void	TCPServer::addClient(TCPClientConn &client)
+void	TCPServer::addClient(TCPConn &client)
 {
 	pollfd	tmp;
 	bool need_update_pollfd_ptr = false;
@@ -144,9 +144,9 @@ void	TCPServer::addClient(TCPClientConn &client)
 		updatePollfdStruct();
 }
 
-void	TCPServer::removeClient(TCPClientConn &client)
+void	TCPServer::removeClient(TCPConn &client)
 {
-	for (std::vector<TCPClientConn>::iterator it = clients.begin(); it < clients.end(); it++)
+	for (std::vector<TCPConn>::iterator it = clients.begin(); it < clients.end(); it++)
 	{
 		if (&(*it) == &client)
 		{
