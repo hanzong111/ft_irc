@@ -7,24 +7,23 @@
 # include <string>
 # include <vector>
 
-class TCPConn;
-
+template <typename ClientType>
 class TCPServer : virtual public TCPHost
 {
 	public:
-		TCPServer &operator=(const TCPServer &other);
+		TCPServer<ClientType> &operator=(const TCPServer<ClientType> &other);
 		virtual ~TCPServer();
 
 		int				startListening();
 		void			acceptConnReq();
-		void			addClient(TCPConn &client);
-		void			removeClient(TCPConn &client);
+		void			addClient(ClientType &client);
+		void			removeClient(ClientType &client);
 		void			pollEvents(int timeout);
 		virtual void	handleEvents() = 0;
 
 	protected:
 		TCPServer(const std::string &ip_addr, uint16_t port_num);
-		TCPServer(const TCPServer &other);
+		TCPServer(const TCPServer<ClientType> &other);
 
 		int		createTCPSocket();
 		int		bindToInterface(const std::string &ip_addr, uint16_t port_num);
@@ -32,7 +31,7 @@ class TCPServer : virtual public TCPHost
 		void	updatePollfdStruct();
 		
 		std::vector<pollfd>		pollfd_vect;
-		std::vector<TCPConn>	clients;
+		std::vector<ClientType>	clients;
 		pollfd					*pollfd_struct;
 		int						n_events;
 };

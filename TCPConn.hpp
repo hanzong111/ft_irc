@@ -3,18 +3,34 @@
 
 # include "TCPHost.hpp"
 # include <poll.h>
+# include <cstring>
 # include <string>
+# include <cerrno>
+# include <stdexcept>
 # include <queue>
 # include <netinet/in.h>
 
 # define TCPSERVER_INIT_BUF_SIZE 1024
 
+template <typename ClientType>
 class TCPServer;
 
 class TCPConn : virtual public TCPHost
 {
 	public:
-		TCPConn(const TCPServer &server);
+		template <typename ClientType>
+		TCPConn(const TCPServer<ClientType> &server)
+		{
+			fd = accept(server.getFd(), (sockaddr *) &addr, &addr_len);
+			if (fd == -1)
+				throw std::runtime_error(std::string("accept: ") + strerror(errno));
+			recv_buf = new char[TCPSERVER_INIT_BUF_SIZE];
+			recv_buf_size = TCPSERVER_INIT_BUF_SIZE; 
+			recv_data_size = 0;
+			recv_retrieve_size = 0;
+			partial_receive = false;
+			pollfd_struct = NULL;
+		};
 		TCPConn(const TCPConn &other);
 		TCPConn &operator=(const TCPConn &other);
 		virtual ~TCPConn();

@@ -2,12 +2,13 @@
 # define FT_IRC_TESTSERVER_HPP
 
 # include "TCPServer.hpp"
+# include "TCPServer_impl.hpp"
 # include <poll.h>
 # include <netinet/in.h>
 # include <string>
 # include <vector>
 
-class TestServer : virtual public TCPServer
+class TestServer : virtual public TCPServer<TCPConn>
 {
 	public:
 		TestServer(const std::string &ip_addr, uint16_t port_num);

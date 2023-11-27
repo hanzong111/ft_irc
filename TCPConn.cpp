@@ -1,6 +1,7 @@
 #include "TCPConn.hpp"
 #include "TCPHost.hpp"
 #include "TCPServer.hpp"
+#include "TCPServer_impl.hpp"
 #include <unistd.h>
 #include <poll.h>
 #include <cstring>
@@ -13,20 +14,6 @@
 TCPConn::TCPConn() :
 	TCPHost()
 {
-	recv_buf = new char[TCPSERVER_INIT_BUF_SIZE];
-	recv_buf_size = TCPSERVER_INIT_BUF_SIZE; 
-	recv_data_size = 0;
-	recv_retrieve_size = 0;
-	partial_receive = false;
-	pollfd_struct = NULL;
-}
-
-TCPConn::TCPConn(const TCPServer &server) :
-	TCPHost()
-{
-	fd = accept(server.getFd(), (sockaddr *) &addr, &addr_len);
-	if (fd == -1)
-		throw std::runtime_error(std::string("accept: ") + strerror(errno));
 	recv_buf = new char[TCPSERVER_INIT_BUF_SIZE];
 	recv_buf_size = TCPSERVER_INIT_BUF_SIZE; 
 	recv_data_size = 0;

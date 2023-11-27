@@ -1,4 +1,8 @@
+#ifndef FT_IRC_TCPSERVER_IMPL_HPP
+# define FT_IRC_TCPSERVER_IMPL_HPP
+
 #include "TCPServer.hpp"
+#include "TCPConn.hpp"
 #include "TCPHost.hpp"
 #include <unistd.h>
 #include <fcntl.h>
@@ -114,12 +118,11 @@ void	TCPServer<ClientType>::acceptConnReq()
 {
 	try
 	{
-		ClientType	client(*this);
+		TCPConn	client(*this);
 
 		addClient(client);
 		std::cout << "Client (" << clients.back().getIPAddrStr() << ":"
 			<< clients.back().getPortNumH() << ") connected" << std::endl;
-		std::cout << "Client fd: " << clients.back().getFd() << std::endl;
 	}
 	catch (std::exception &e)
 	{
@@ -155,7 +158,7 @@ void	TCPServer<ClientType>::addClient(ClientType &client)
 template <typename ClientType>
 void	TCPServer<ClientType>::removeClient(ClientType &client)
 {
-	for (typename std::vector<ClientType>::iterator it = clients.begin(); it < clients.end(); it++)
+	for (std::vector<TCPConn>::iterator it = clients.begin(); it < clients.end(); it++)
 	{
 		if (&(*it) == &client)
 		{
@@ -190,3 +193,5 @@ void	TCPServer<ClientType>::updatePollfdStruct()
 	for (size_t i = 0; i < clients.size(); i++)
 		pollfd_struct[i + 1].fd = clients[i].getFd();
 }
+
+#endif
