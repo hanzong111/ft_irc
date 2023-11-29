@@ -30,10 +30,15 @@ class TCPServer : virtual public TCPHost
 		void	updatePollfdPtrs();
 		void	updatePollfdStruct();
 		
+		// `pollfd_vect.front()` is always contains the pollfd struct for the
+		// server's listening port. Structs for clients start at offset of 1
+		// from `pollfd_vect.front()`.
 		std::vector<pollfd>		pollfd_vect;
+		// `clients` should always be in the same order as the pollfd structs
+		// in `pollfd_vect`. 
 		std::vector<ClientType>	clients;
-		pollfd					*pollfd_struct;
-		int						n_events;
+		pollfd					*pollfd_struct; // Always points to `pollfd_vect.front()`
+		int						n_events; // Number of polled events to handle
 };
 
 #endif
