@@ -156,7 +156,7 @@ void	IRCServer::processCommands(IRCUser &user, const std::string &cmd)
 	}
 	catch (std::out_of_range &e)
 	{
-		std::cerr << "Warning: Invalid command (" << msg.command << ")";
+		std::cerr << "Warning: Invalid command (" << msg.command << ")" << std::endl;
 		return ;
 	}
 	// Call function
