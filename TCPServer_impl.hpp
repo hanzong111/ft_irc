@@ -118,7 +118,7 @@ void	TCPServer<ClientType>::acceptConnReq()
 {
 	try
 	{
-		TCPConn	client(*this);
+		ClientType	client(*this);
 
 		addClient(client);
 		std::cout << "Client (" << clients.back().getIPAddrStr() << ":"
@@ -158,7 +158,7 @@ void	TCPServer<ClientType>::addClient(ClientType &client)
 template <typename ClientType>
 void	TCPServer<ClientType>::removeClient(ClientType &client)
 {
-	for (std::vector<TCPConn>::iterator it = clients.begin(); it < clients.end(); it++)
+	for (typename std::vector<ClientType>::iterator it = clients.begin(); it < clients.end(); it++)
 	{
 		if (&(*it) == &client)
 		{
