@@ -105,7 +105,7 @@
  * ERR_ERRONEUSNICKNAME(servername, nickname, requested_nickname)
  */
 # define ERR_ERRONEUSNICKNAME(server, target, requested_nickname) \
-    IRC_RPL("432", server, target) + requested_nickname \
+    IRC_RPL("432", server, target) + " " + requested_nickname \
         + " :Erroneous nickname\r\n"
 //------------------------------END OF SECTION--------------------------------//
 
@@ -114,7 +114,7 @@
  * ERR_NICKNAMEINUSE(servername, nickname, requested_nickname)
  */
 # define ERR_NICKNAMEINUSE(server, target, requested_nickname) \
-    IRC_RPL("433", server, target) + requested_nickname \
+    IRC_RPL("433", server, target) + " " + requested_nickname \
         + " :Nickname is already in use\r\n"
 //------------------------------END OF SECTION--------------------------------//
 
@@ -123,7 +123,7 @@
  * ERR_UNAVAILRESOURCE(servername, nickname, param)
  */
 # define ERR_UNAVAILRESOURCE(server, target, param) \
-    IRC_RPL("437", server, target) + param \
+    IRC_RPL("437", server, target) + " " param \
         + " :Nick/channel is temporarily unavailable\r\n"
 //------------------------------END OF SECTION--------------------------------//
 
