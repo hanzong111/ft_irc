@@ -40,6 +40,7 @@ class TCPConn : virtual public TCPHost
 		void		queueSend(const void* buf, size_t n);
 		ssize_t		processSendQueue(int flags);
 		ssize_t		requestRecv(const char* delimiter, size_t delimiter_size, int flags);
+		size_t		checkRecvBuf(const char* delimiter, size_t delimiter_size);
 		bool 		retrieveRecvBuf(char *buffer, size_t *size);
 		short		getPollREvents() const throw();
 		void		setPollREvents(short revents) throw();

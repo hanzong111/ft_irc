@@ -236,21 +236,7 @@ ssize_t TCPConn::requestRecv(const char* delimiter, size_t delimiter_size, int f
 	if (n_bytes_received > 0)
 	{
 		recv_data_size += n_bytes_received;
-
-		// Search for the delimiter in the received data
-		const char* found_delimiter = std::search(recv_buf, recv_buf + recv_data_size, delimiter, delimiter + delimiter_size);
-
-		if (found_delimiter != recv_buf + recv_data_size) {
-
-			// Delimiter found, return the size of data up to the delimiter
-			recv_retrieve_size = found_delimiter - recv_buf + delimiter_size;
-			partial_receive = false;
-			return (recv_retrieve_size);
-		} else {
-			// Delimiter not found (partial receive), set flag for subsequent calls
-			partial_receive = true;
-			return (0);
-		}
+		return (checkRecvBuf(delimiter, delimiter_size));
 	}
 	else if (n_bytes_received == 0)
 	{
@@ -260,6 +246,23 @@ ssize_t TCPConn::requestRecv(const char* delimiter, size_t delimiter_size, int f
 	else
 	{
 		// recv() error
+		return (0);
+	}
+}
+
+size_t	TCPConn::checkRecvBuf(const char* delimiter, size_t delimiter_size)
+{
+	// Search for the delimiter in the recv_buf
+	const char* found_delimiter = std::search(recv_buf, recv_buf + recv_data_size, delimiter, delimiter + delimiter_size);
+
+	if (found_delimiter != recv_buf + recv_data_size) {
+		// Delimiter found, return the size of data up to the delimiter
+		recv_retrieve_size = found_delimiter - recv_buf + delimiter_size;
+		partial_receive = false;
+		return (recv_retrieve_size);
+	} else {
+		// Delimiter not found (partial receive), set flag for subsequent calls
+		partial_receive = true;
 		return (0);
 	}
 }
