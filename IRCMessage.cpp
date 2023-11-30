@@ -16,7 +16,7 @@ IRCMessage::IRCMessage(const std::string &msg) :
 
 	if (msg_len == 0 || msg_len == msg.npos)
 		return ;
-	if (msg.front() == ':')
+	if (msg[0] == ':')
 	{
 		len = getTokenLen(msg, 1, " ");
 		prefix = msg.substr(1, len);
