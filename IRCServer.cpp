@@ -185,6 +185,7 @@ void	IRCServer::sendWelcomeMessages(IRCUser &user)
 	str += RPL_YOURHOST(servername, user.getNickname(), IRCSERVER_VER);
 	str += RPL_CREATED(servername, user.getNickname(), time_created);
 	str += RPL_MYINFO(servername, user.getNickname(),
+				IRCSERVER_VER,
 				IRCSERVER_SUPPORTED_USER_MODES,
 				IRCSERVER_SUPPORTED_CHANNEL_MODES);
 	user.queueSend(str.c_str(), str.size());

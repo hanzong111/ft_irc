@@ -69,9 +69,9 @@
 /* Usage:
  * RPL_MYINFO(servername, nickname, version_str, usermodes, channelmodes)
  */
-# define RPL_MYINFO(server, target, usermodes, channelmodes) \
-    IRC_RPL("004", server, target) + " " + server + " " + usermodes + " " \
-		+ channelmodes + "\r\n"
+# define RPL_MYINFO(server, target, version, usermodes, channelmodes) \
+    IRC_RPL("004", server, target) + " " + server + " " + version + " " \
+		+ usermodes + " " + channelmodes + "\r\n"
 //------------------------------END OF SECTION--------------------------------//
 
 //---------------------------------RPL_NOTOPIC--------------------------------//
