@@ -266,7 +266,7 @@ void	IRCServer::handleUSER(IRCUser &user, const IRCMessage &msg)
 	int	mode = std::atoi(msg.params[1].c_str()) & (WALLOPS | INVISIBLE);
 	user.setModeFlag(mode);
 	// Check if registration is completed
-	if (!user.getNickname().empty())
+	if (user.getNickname().find(IRCUSER_DEFAULT_NICK_PREFIX) != 0)
 	{
 		user.makeRegistered();
 		sendWelcomeMessages(user);
