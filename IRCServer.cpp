@@ -124,8 +124,8 @@ size_t	IRCServer::handlePollIn(size_t ind)
 	{
 		std::cout << "Client (" << clients[ind].getIPAddrStr() << ":"
 			<< clients[ind].getPortNumH() << ") disconnected" << std::endl;
-		removeClient(clients[ind]);
 		users_map.erase(clients[ind].getNickname());
+		removeClient(clients[ind]);
 		updateUsersMap();
 		return (ind - 1);
 	}
