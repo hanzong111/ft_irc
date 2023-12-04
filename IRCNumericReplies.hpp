@@ -88,7 +88,7 @@
  * RPL_TOPIC(servername, nickname, channel_name, topic_str)
  */
 # define RPL_TOPIC(server, target, channel_name, topic_str) \
-    IRC_RPL("331", server, target) + " " + channel_name + " :" + topic_str \
+    IRC_RPL("332", server, target) + " " + channel_name + " :" + topic_str \
          + "\r\n"
 //------------------------------END OF SECTION--------------------------------//
 
