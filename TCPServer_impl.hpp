@@ -118,6 +118,8 @@ void	TCPServer<ClientType>::acceptConnReq()
 {
 	try
 	{
+		// Constructor of ClientType (which should be derived classes of
+		// TCPConn) should call `accept()`.
 		ClientType	client(*this);
 
 		addClient(client);
