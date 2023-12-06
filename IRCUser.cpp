@@ -11,6 +11,7 @@ IRCUser::IRCUser(const IRCServer &server) :
 	TCPConn(server),
 	is_authenticated(false),
 	is_registered(false),
+	is_operator(false),
 	usermodes(0)
 {
 	std::ostringstream os;
@@ -22,6 +23,7 @@ IRCUser::IRCUser(const TCPServer<IRCUser> &server) :
 	TCPConn(server),
 	is_authenticated(false),
 	is_registered(false),
+	is_operator(false),
 	usermodes(0)
 {
 	std::ostringstream os;
@@ -34,6 +36,7 @@ IRCUser::IRCUser(const IRCUser &other) :
 	TCPConn(other),
 	is_authenticated(other.is_authenticated),
 	is_registered(other.is_registered),
+	is_operator(other.is_operator),
 	usermodes(other.usermodes),
 	nickname(other.nickname),
 	username(other.username),
@@ -47,6 +50,7 @@ IRCUser &IRCUser::operator=(const IRCUser &other)
 	TCPConn::operator=(other);
 	is_authenticated = other.is_authenticated;
 	is_registered = other.is_registered;
+	is_operator = other.is_operator;
 	nickname = other.nickname;
 	username = other.username;
 	real_name = other.real_name;
@@ -137,6 +141,11 @@ bool	IRCUser::isRegistered() const throw()
 	return (is_registered);
 }
 
+bool	IRCUser::isOperator() const throw()
+{
+	return (is_operator);
+}
+
 
 void	IRCUser::makeAuthenticated() throw()
 {
@@ -147,3 +156,9 @@ void	IRCUser::makeRegistered() throw()
 {
 	is_registered = true;
 }
+
+void	IRCUser::makeOperator() throw()
+{
+	is_operator = true;
+}
+

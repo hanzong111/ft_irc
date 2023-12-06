@@ -42,8 +42,10 @@ class IRCUser : public TCPConn
 		std::string			changeRealName(const std::string &new_real_name);
 		bool				isAuthenticated() const throw();
 		bool				isRegistered() const throw();
+		bool				isOperator() const throw();
 		void				makeAuthenticated() throw();
 		void				makeRegistered() throw();
+		void				makeOperator() throw ();
 		int					getModeFlags();
 		void				setModeFlag(int flag);
 		void				clearModeFlag(int flag);
@@ -52,6 +54,7 @@ class IRCUser : public TCPConn
 		static uint64_t	count;
 		bool			is_authenticated;
 		bool			is_registered;
+		bool			is_operator;
 		int				usermodes;
 		std::string		nickname;
 		std::string		username;

@@ -44,6 +44,7 @@ class IRCServer : virtual public TCPServer<IRCUser>
 		void	handlePASS(IRCUser &user, const IRCMessage &msg);
 		void	handleNICK(IRCUser &user, const IRCMessage &msg);
 		void	handleUSER(IRCUser &user, const IRCMessage &msg);
+		void	handleOPER(IRCUser &user, const IRCMessage &msg);
 
 		std::map<std::string, MemFuncPtr>			func_map;
 		// `users_map` maps username to index in `clients`

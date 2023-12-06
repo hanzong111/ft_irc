@@ -135,6 +135,15 @@
     IRC_RPL("484", server, target) + " :Your connection is restricted!\r\n"
 //------------------------------END OF SECTION--------------------------------//
 
+//-----------------------------ERR_WRONGPASS-----------------------------//
+/* Usage:
+ * ERR_WRONGPASS(servername, nickname, command)
+ */
+# define ERR_WRONGPASS(server, target, command) \
+    IRC_RPL("999", server, target) + " " + command \
+        + " :Wrong Password\r\n"
+//------------------------------END OF SECTION--------------------------------//
+
 //-----------------------------ERR_NEEDMOREPARAMS-----------------------------//
 /* Usage:
  * ERR_NEEDMOREPARAMS(servername, nickname, command)
@@ -151,6 +160,22 @@
 # define ERR_ALREADYREGISTRED(server, target) \
     IRC_RPL("462", server, target) + " :Unauthorized command " \
 		+ "(already registered)\r\n"
+//------------------------------END OF SECTION--------------------------------//
+
+//-----------------------------RPL_YOUREOPER-----------------------------//
+/* Usage:
+ * RPL_YOUREOPER(servername, nickname, command)
+ */
+# define RPL_YOUREOPER(server, target) \
+    IRC_RPL("381", server, target) + " :You are now an IRC operator\r\n"
+//------------------------------END OF SECTION--------------------------------//
+
+//-----------------------------ERR_PASSWDMISMATCH-----------------------------//
+/* Usage:
+ * ERR_PASSWDMISMATCH(servername, nickname, command)
+ */
+# define ERR_PASSWDMISMATCH(server, target) \
+    IRC_RPL("464", server, target) + " :Password incorrect\r\n"
 //------------------------------END OF SECTION--------------------------------//
 
 #endif

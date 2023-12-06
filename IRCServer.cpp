@@ -15,6 +15,8 @@
 #include <ctime>
 #include <iostream>
 
+#define OPERATOR_PASS "1234"
+
 //std::map<std::string, IRCServer::MemFuncPtr> func_map;
 
 IRCServer::IRCServer(const std::string &ip_addr, uint16_t port_num) :
@@ -196,6 +198,7 @@ void	IRCServer::populateFuncMap()
 	func_map["PASS"] = &IRCServer::handlePASS;
 	func_map["NICK"] = &IRCServer::handleNICK;
 	func_map["USER"] = &IRCServer::handleUSER;
+	func_map["OPER"] = &IRCServer::handleOPER;
 }
 
 void	IRCServer::handlePASS(IRCUser &user, const IRCMessage &msg)
@@ -206,6 +209,8 @@ void	IRCServer::handlePASS(IRCUser &user, const IRCMessage &msg)
 		reply = ERR_NEEDMOREPARAMS(servername, user.getNickname(), msg.command);
 	else if (user.isAuthenticated() && user.isRegistered())
 		reply = ERR_ALREADYREGISTRED(servername, user.getNickname());
+	else if (!(msg.params[0] == conn_pass))
+		reply = ERR_WRONGPASS(servername, user.getNickname(), msg.command);
 	if (!reply.empty())
 		user.queueSend(reply.c_str(), reply.size());
 	else if (msg.params[0] == conn_pass)
@@ -271,6 +276,26 @@ void	IRCServer::handleUSER(IRCUser &user, const IRCMessage &msg)
 		user.makeRegistered();
 		sendWelcomeMessages(user);
 	}
+}
+
+void	IRCServer::handleOPER(IRCUser &user, const IRCMessage &msg)
+{
+	std::string reply;
+
+	if (msg.params.size() < 2)
+		reply = ERR_NEEDMOREPARAMS(servername, user.getNickname(), msg.command);
+	else if (msg.params[1] != OPERATOR_PASS)
+		reply = ERR_PASSWDMISMATCH(servername, user.getNickname());
+	else
+	{
+		reply = RPL_YOUREOPER(servername, user.getNickname());
+		user.makeOperator();
+	}
+	if (!reply.empty())
+	{
+		user.queueSend(reply.c_str(), reply.size());
+		return ;
+	}	
 }
 
 std::string	IRCServer::getCurerntTimeAsStr()
