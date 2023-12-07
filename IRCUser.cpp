@@ -12,7 +12,7 @@ IRCUser::IRCUser(const IRCServer &server) :
 	is_authenticated(false),
 	is_registered(false),
 	is_operator(false),
-	usermodes(0)
+	usermode_str("+")
 {
 	std::ostringstream os;
 	os << IRCUSER_DEFAULT_NICK_PREFIX << count++;
@@ -24,7 +24,7 @@ IRCUser::IRCUser(const TCPServer<IRCUser> &server) :
 	is_authenticated(false),
 	is_registered(false),
 	is_operator(false),
-	usermodes(0)
+	usermode_str("+")
 {
 	std::ostringstream os;
 	os << IRCUSER_DEFAULT_NICK_PREFIX << count++;
@@ -37,7 +37,7 @@ IRCUser::IRCUser(const IRCUser &other) :
 	is_authenticated(other.is_authenticated),
 	is_registered(other.is_registered),
 	is_operator(other.is_operator),
-	usermodes(other.usermodes),
+	usermode_str(other.usermode_str),
 	nickname(other.nickname),
 	username(other.username),
 	real_name(other.real_name)
@@ -54,7 +54,7 @@ IRCUser &IRCUser::operator=(const IRCUser &other)
 	nickname = other.nickname;
 	username = other.username;
 	real_name = other.real_name;
-	usermodes = other.usermodes;
+	usermode_str = other.usermode_str;
 	return (*this);
 }
 
@@ -116,19 +116,21 @@ std::string	IRCUser::changeRealName(const std::string &new_real_name)
 	return (old_real_name);
 }
 
-int	IRCUser::getModeFlags()
+std::string	&IRCUser::getModeFlags()
 {
-	return (usermodes);
+	return (usermode_str);
 }
 
-void	IRCUser::setModeFlag(int flag)
+void	IRCUser::setModeFlag(std::string const &newflag)
 {
-	usermodes |= flag;
+	usermode_str += newflag;
 }
 
-void	IRCUser::clearModeFlag(int flag)
+void	IRCUser::clearModeFlag(std::string &rmflag)
 {
-	usermodes &= ~flag;
+	std::string::size_type found = usermode_str.find(rmflag);
+	if (found != std::string::npos)
+		usermode_str.erase(found, 1);
 }
 
 bool	IRCUser::isAuthenticated() const throw()

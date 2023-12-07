@@ -199,6 +199,7 @@ void	IRCServer::populateFuncMap()
 	func_map["NICK"] = &IRCServer::handleNICK;
 	func_map["USER"] = &IRCServer::handleUSER;
 	func_map["OPER"] = &IRCServer::handleOPER;
+	func_map["MODE"] = &IRCServer::handleMODE;
 }
 
 void	IRCServer::handlePASS(IRCUser &user, const IRCMessage &msg)
@@ -227,7 +228,7 @@ void	IRCServer::handleNICK(IRCUser &user, const IRCMessage &msg)
 		reply = ERR_ERRONEUSNICKNAME(servername, user.getNickname(), msg.params[0]);
 	else if (users_map.find(msg.params[0]) != users_map.end())
 		reply = ERR_NICKNAMEINUSE(servername, user.getNickname(), msg.params[0]);
-	else if (user.getModeFlags() & RESTRICTED)
+	else if (user.getModeFlags().find("r") != std::string::npos)
 		reply = ERR_RESTRICTED(servername, user.getNickname());
 	if (!reply.empty())
 	{
@@ -268,8 +269,8 @@ void	IRCServer::handleUSER(IRCUser &user, const IRCMessage &msg)
 	// It would be a good idea to check if the mode specified in the message
 	// is a single digit, but since there is no reply specified for invalid
 	// parameter in RFC2812, the check isn't performed here.
-	int	mode = std::atoi(msg.params[1].c_str()) & (WALLOPS | INVISIBLE);
-	user.setModeFlag(mode);
+	// int	mode = std::atoi(msg.params[1].c_str()) & (WALLOPS | INVISIBLE);
+	user.setModeFlag("i");
 	// Check if registration is completed
 	if (user.getNickname().find(IRCUSER_DEFAULT_NICK_PREFIX) != 0)
 	{
@@ -290,7 +291,25 @@ void	IRCServer::handleOPER(IRCUser &user, const IRCMessage &msg)
 	{
 		reply = RPL_YOUREOPER(servername, user.getNickname());
 		user.makeOperator();
+		user.setModeFlag("o");
 	}
+	if (!reply.empty())
+	{
+		user.queueSend(reply.c_str(), reply.size());
+		return ;
+	}	
+}
+
+void	IRCServer::handleMODE(IRCUser &user, const IRCMessage &msg)
+{
+	std::string reply;
+
+	if (msg.params.size() < 1)
+		reply = ERR_NEEDMOREPARAMS(servername, user.getNickname(), msg.command);
+	else if (user.getNickname() != msg.params[0])
+		reply = ERR_USERSDONTMATCH(servername, user.getNickname());
+	else if (msg.params.size() == 1)
+		reply = RPL_UMODEIS(servername, user.getNickname(), user.getModeFlags());
 	if (!reply.empty())
 	{
 		user.queueSend(reply.c_str(), reply.size());

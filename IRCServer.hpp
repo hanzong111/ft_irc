@@ -45,11 +45,13 @@ class IRCServer : virtual public TCPServer<IRCUser>
 		void	handleNICK(IRCUser &user, const IRCMessage &msg);
 		void	handleUSER(IRCUser &user, const IRCMessage &msg);
 		void	handleOPER(IRCUser &user, const IRCMessage &msg);
+		void	handleMODE(IRCUser &user, const IRCMessage &msg);
 
 		std::map<std::string, MemFuncPtr>			func_map;
 		// `users_map` maps username to index in `clients`
 		std::map<std::string, size_t>				users_map;
 		std::map<std::string, IRCChannel>			channels;
+		std::vector<std::string>   			        flags_names;
 		std::string									conn_pass;
 		std::string									servername;
 		std::string									time_created;

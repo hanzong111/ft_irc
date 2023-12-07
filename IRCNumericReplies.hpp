@@ -178,4 +178,21 @@
     IRC_RPL("464", server, target) + " :Password incorrect\r\n"
 //------------------------------END OF SECTION--------------------------------//
 
+//-----------------------------ERR_USERSDONTMATCH-----------------------------//
+/* Usage:
+ * ERR_USERSDONTMATCH(servername, nickname, command)
+ */
+# define ERR_USERSDONTMATCH(server, target) \
+    IRC_RPL("502", server, target) + " :Cannot change mode for other users\r\n"
+//------------------------------END OF SECTION--------------------------------//
+
+//-----------------------------RPL_UMODEIS-----------------------------//
+/* Usage:
+ * RPL_UMODEIS(servername, nickname, mode)
+ */
+# define RPL_UMODEIS(server, target, mode) \
+    IRC_RPL("221", server, target) + " " + mode \
+        + "\r\n"
+//------------------------------END OF SECTION--------------------------------//
+
 #endif

@@ -46,16 +46,16 @@ class IRCUser : public TCPConn
 		void				makeAuthenticated() throw();
 		void				makeRegistered() throw();
 		void				makeOperator() throw ();
-		int					getModeFlags();
-		void				setModeFlag(int flag);
-		void				clearModeFlag(int flag);
+		std::string			&getModeFlags();
+		void				setModeFlag(std::string const &newflag);
+		void				clearModeFlag(std::string &rmflag);
 
 	protected:
 		static uint64_t	count;
 		bool			is_authenticated;
 		bool			is_registered;
 		bool			is_operator;
-		int				usermodes;
+		std::string		usermode_str;
 		std::string		nickname;
 		std::string		username;
 		std::string		real_name;
