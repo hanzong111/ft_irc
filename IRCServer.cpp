@@ -346,6 +346,17 @@ void	IRCServer::handleMODE(IRCUser &user, const IRCMessage &msg)
 	}	
 }
 
+void	IRCServer::handleQUIT(IRCUser &user, const IRCMessage &msg)
+{
+	size_t		ind;
+	
+	(void)msg;
+	ind = users_map.at(user.getUsername());
+	users_map.erase(clients[ind].getNickname());
+	removeClient(clients[ind]);
+	updateUsersMap();
+}
+
 std::string	IRCServer::getCurerntTimeAsStr()
 {
 	time_t rawtime;
