@@ -228,7 +228,7 @@ void	IRCServer::handleNICK(IRCUser &user, const IRCMessage &msg)
 		reply = ERR_ERRONEUSNICKNAME(servername, user.getNickname(), msg.params[0]);
 	else if (users_map.find(msg.params[0]) != users_map.end())
 		reply = ERR_NICKNAMEINUSE(servername, user.getNickname(), msg.params[0]);
-	else if (user.getModeFlags().find("r") != std::string::npos)
+	else if (user.getModeFlags() & RESTRICTED)
 		reply = ERR_RESTRICTED(servername, user.getNickname());
 	if (!reply.empty())
 	{
@@ -269,8 +269,8 @@ void	IRCServer::handleUSER(IRCUser &user, const IRCMessage &msg)
 	// It would be a good idea to check if the mode specified in the message
 	// is a single digit, but since there is no reply specified for invalid
 	// parameter in RFC2812, the check isn't performed here.
-	// int	mode = std::atoi(msg.params[1].c_str()) & (WALLOPS | INVISIBLE);
-	user.setModeFlag("i");
+	int	mode = std::atoi(msg.params[1].c_str()) & (WALLOPS | INVISIBLE);
+	user.setModeFlag(mode);
 	// Check if registration is completed
 	if (user.getNickname().find(IRCUSER_DEFAULT_NICK_PREFIX) != 0)
 	{
@@ -290,8 +290,7 @@ void	IRCServer::handleOPER(IRCUser &user, const IRCMessage &msg)
 	else
 	{
 		reply = RPL_YOUREOPER(servername, user.getNickname());
-		user.makeOperator();
-		user.setModeFlag("o");
+		user.setModeFlag(OPER);
 	}
 	if (!reply.empty())
 	{
@@ -303,13 +302,42 @@ void	IRCServer::handleOPER(IRCUser &user, const IRCMessage &msg)
 void	IRCServer::handleMODE(IRCUser &user, const IRCMessage &msg)
 {
 	std::string reply;
+	std::map<enum IRCUserModes, const char>::iterator flag;
 
 	if (msg.params.size() < 1)
 		reply = ERR_NEEDMOREPARAMS(servername, user.getNickname(), msg.command);
 	else if (user.getNickname() != msg.params[0])
 		reply = ERR_USERSDONTMATCH(servername, user.getNickname());
 	else if (msg.params.size() == 1)
-		reply = RPL_UMODEIS(servername, user.getNickname(), user.getModeFlags());
+		reply = RPL_UMODEIS(servername, user.getNickname(), user.getModestr());
+	else if (msg.params[1].size() != 2 || !(msg.params[1][0] == '+' || msg.params[1][0] == '-'))
+		reply = ERR_UMODEUNKNOWNFLAG(servername, user.getNickname());
+	else
+	{
+		flag = user.getFlag_map().end();
+		for (std::map<enum IRCUserModes, const char>::iterator it = user.getFlag_map().begin(); it != user.getFlag_map().end(); ++it)
+		{
+    		if(it->second == msg.params[1][1])
+				flag = it;
+    	}
+		if(flag == user.getFlag_map().end())
+			reply = ERR_UMODEUNKNOWNFLAG(servername, user.getNickname());
+		else
+		{
+			if(msg.params[1][0] == '+')
+			{
+				if(flag->second == 'o' || flag->second == 'O' || flag->second == 'a')
+					return;
+				user.setModeFlag(flag->first);
+			}
+			else if (msg.params[1][0] == '-')
+			{
+				if(flag->second == 'r')
+					return;
+				user.clearModeFlag(flag->first);
+			}
+		}
+	}
 	if (!reply.empty())
 	{
 		user.queueSend(reply.c_str(), reply.size());

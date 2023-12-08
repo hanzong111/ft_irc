@@ -195,4 +195,12 @@
         + "\r\n"
 //------------------------------END OF SECTION--------------------------------//
 
+//-----------------------------ERR_UMODEUNKNOWNFLAG-----------------------------//
+/* Usage:
+ * ERR_UMODEUNKNOWNFLAG(servername, nickname, command)
+ */
+# define ERR_UMODEUNKNOWNFLAG(server, target) \
+    IRC_RPL("501", server, target) + " :Unknown MODE flag\r\n"
+//------------------------------END OF SECTION--------------------------------//
+
 #endif

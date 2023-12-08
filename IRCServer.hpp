@@ -51,7 +51,6 @@ class IRCServer : virtual public TCPServer<IRCUser>
 		// `users_map` maps username to index in `clients`
 		std::map<std::string, size_t>				users_map;
 		std::map<std::string, IRCChannel>			channels;
-		std::vector<std::string>   			        flags_names;
 		std::string									conn_pass;
 		std::string									servername;
 		std::string									time_created;

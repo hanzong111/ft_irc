@@ -11,24 +11,38 @@ IRCUser::IRCUser(const IRCServer &server) :
 	TCPConn(server),
 	is_authenticated(false),
 	is_registered(false),
-	is_operator(false),
-	usermode_str("+")
+	usermodes(0),
+	mode_str("+")
 {
 	std::ostringstream os;
 	os << IRCUSER_DEFAULT_NICK_PREFIX << count++;
 	nickname = os.str();
+	flags_enum.insert(std::make_pair(AWAY, 'a'));
+	flags_enum.insert(std::make_pair(RESTRICTED,'r'));
+	flags_enum.insert(std::make_pair(WALLOPS,'w'));
+	flags_enum.insert(std::make_pair(INVISIBLE,'i'));
+	flags_enum.insert(std::make_pair(OPER,'o'));
+	flags_enum.insert(std::make_pair(LOCAL_OPER,'O'));
+	flags_enum.insert(std::make_pair(SERVER_NOTICES,'s'));
 }
 
 IRCUser::IRCUser(const TCPServer<IRCUser> &server) :
 	TCPConn(server),
 	is_authenticated(false),
 	is_registered(false),
-	is_operator(false),
-	usermode_str("+")
+	usermodes(0),
+	mode_str("+")
 {
 	std::ostringstream os;
 	os << IRCUSER_DEFAULT_NICK_PREFIX << count++;
 	nickname = os.str();
+	flags_enum.insert(std::make_pair(AWAY, 'a'));
+	flags_enum.insert(std::make_pair(RESTRICTED,'r'));
+	flags_enum.insert(std::make_pair(WALLOPS,'w'));
+	flags_enum.insert(std::make_pair(INVISIBLE,'i'));
+	flags_enum.insert(std::make_pair(OPER,'o'));
+	flags_enum.insert(std::make_pair(LOCAL_OPER,'O'));
+	flags_enum.insert(std::make_pair(SERVER_NOTICES,'s'));
 }
 
 IRCUser::IRCUser(const IRCUser &other) :
@@ -36,8 +50,9 @@ IRCUser::IRCUser(const IRCUser &other) :
 	TCPConn(other),
 	is_authenticated(other.is_authenticated),
 	is_registered(other.is_registered),
-	is_operator(other.is_operator),
-	usermode_str(other.usermode_str),
+	usermodes(other.usermodes),
+	mode_str(other.mode_str),
+	flags_enum(other.flags_enum),
 	nickname(other.nickname),
 	username(other.username),
 	real_name(other.real_name)
@@ -50,11 +65,12 @@ IRCUser &IRCUser::operator=(const IRCUser &other)
 	TCPConn::operator=(other);
 	is_authenticated = other.is_authenticated;
 	is_registered = other.is_registered;
-	is_operator = other.is_operator;
 	nickname = other.nickname;
 	username = other.username;
 	real_name = other.real_name;
-	usermode_str = other.usermode_str;
+	usermodes = other.usermodes;
+	mode_str = other.mode_str;
+	flags_enum = other.flags_enum;
 	return (*this);
 }
 
@@ -92,6 +108,11 @@ const std::string	&IRCUser::getRealName() const throw()
 	return (real_name);
 }
 
+std::map<enum IRCUserModes, const char> &IRCUser::getFlag_map()
+{
+	return (flags_enum);
+}
+
 std::string	IRCUser::changeNickname(const std::string &new_nickname)
 {
 	std::string	old_nickname = nickname;
@@ -116,21 +137,19 @@ std::string	IRCUser::changeRealName(const std::string &new_real_name)
 	return (old_real_name);
 }
 
-std::string	&IRCUser::getModeFlags()
+int	IRCUser::getModeFlags()
 {
-	return (usermode_str);
+	return (usermodes);
 }
 
-void	IRCUser::setModeFlag(std::string const &newflag)
+void	IRCUser::setModeFlag(int flag)
 {
-	usermode_str += newflag;
+	usermodes |= flag;
 }
 
-void	IRCUser::clearModeFlag(std::string &rmflag)
+void	IRCUser::clearModeFlag(int flag)
 {
-	std::string::size_type found = usermode_str.find(rmflag);
-	if (found != std::string::npos)
-		usermode_str.erase(found, 1);
+	usermodes &= ~flag;
 }
 
 bool	IRCUser::isAuthenticated() const throw()
@@ -143,12 +162,6 @@ bool	IRCUser::isRegistered() const throw()
 	return (is_registered);
 }
 
-bool	IRCUser::isOperator() const throw()
-{
-	return (is_operator);
-}
-
-
 void	IRCUser::makeAuthenticated() throw()
 {
 	is_authenticated = true;
@@ -159,8 +172,14 @@ void	IRCUser::makeRegistered() throw()
 	is_registered = true;
 }
 
-void	IRCUser::makeOperator() throw()
+const std::string	&IRCUser::getModestr()
 {
-	is_operator = true;
+	mode_str.clear();
+	mode_str = "+";
+	for (std::map<enum IRCUserModes, const char>::iterator it = flags_enum.begin(); it != flags_enum.end(); ++it)
+	{
+        if(usermodes & it->first)
+			mode_str += it->second;
+    }
+	return (mode_str);
 }
-

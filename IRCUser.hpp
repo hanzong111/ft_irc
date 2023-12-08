@@ -3,6 +3,7 @@
 
 # include "TCPConn.hpp"
 # include <string>
+# include <map>
 
 # define IRCUSER_DEFAULT_NICK_PREFIX "@DEF"
 
@@ -37,6 +38,8 @@ class IRCUser : public TCPConn
 		const std::string	&getNickname() const throw();
 		const std::string	&getUsername() const throw();
 		const std::string	&getRealName() const throw();
+		const std::string	&getModestr();
+		std::map<enum IRCUserModes, const char> &getFlag_map();
 		std::string			changeNickname(const std::string &new_nickname);
 		std::string			changeUsername(const std::string &new_username);
 		std::string			changeRealName(const std::string &new_real_name);
@@ -45,17 +48,17 @@ class IRCUser : public TCPConn
 		bool				isOperator() const throw();
 		void				makeAuthenticated() throw();
 		void				makeRegistered() throw();
-		void				makeOperator() throw ();
-		std::string			&getModeFlags();
-		void				setModeFlag(std::string const &newflag);
-		void				clearModeFlag(std::string &rmflag);
+		int					getModeFlags();
+		void				setModeFlag(int flag);
+		void				clearModeFlag(int flag);
 
 	protected:
 		static uint64_t	count;
 		bool			is_authenticated;
 		bool			is_registered;
-		bool			is_operator;
-		std::string		usermode_str;
+		int				usermodes;
+		std::string		mode_str;
+		std::map<enum IRCUserModes, const char> flags_enum;
 		std::string		nickname;
 		std::string		username;
 		std::string		real_name;
