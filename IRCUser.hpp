@@ -22,8 +22,7 @@ typedef enum IRCUserModes
 	SERVER_NOTICES = 0x40
 } e_IRCUserModes;
 
-typedef std::map<enum IRCUserModes, const char> IRCUserModesMap;
-
+typedef std::map<const char, enum IRCUserModes> IRCUserModesMap;
 class IRCUser : public TCPConn
 {
 	public:
@@ -41,7 +40,7 @@ class IRCUser : public TCPConn
 		const std::string	&getUsername() const throw();
 		const std::string	&getRealName() const throw();
 		const std::string	&getModestr();
-		std::map<enum IRCUserModes, const char> &getFlag_map();
+		IRCUserModesMap 	&getFlag_map();
 		std::string			changeNickname(const std::string &new_nickname);
 		std::string			changeUsername(const std::string &new_username);
 		std::string			changeRealName(const std::string &new_real_name);

@@ -11,13 +11,13 @@ IRCUserModesMap IRCUser::flags_enum;
 
 void	populateModeMap(IRCUserModesMap &map)
 {
-	map.insert(std::make_pair(AWAY, 'a'));
-	map.insert(std::make_pair(RESTRICTED,'r'));
-	map.insert(std::make_pair(WALLOPS,'w'));
-	map.insert(std::make_pair(INVISIBLE,'i'));
-	map.insert(std::make_pair(OPER,'o'));
-	map.insert(std::make_pair(LOCAL_OPER,'O'));
-	map.insert(std::make_pair(SERVER_NOTICES,'s'));
+	map['a'] = AWAY;
+	map['r'] = RESTRICTED;
+	map['w'] = WALLOPS;
+	map['i'] = INVISIBLE;
+	map['o'] = OPER;
+	map['O'] = LOCAL_OPER;
+	map['s'] = SERVER_NOTICES;
 }
 
 IRCUser::IRCUser(const IRCServer &server) :
@@ -110,7 +110,7 @@ const std::string	&IRCUser::getRealName() const throw()
 	return (real_name);
 }
 
-std::map<enum IRCUserModes, const char> &IRCUser::getFlag_map()
+IRCUserModesMap &IRCUser::getFlag_map()
 {
 	return (flags_enum);
 }
@@ -178,10 +178,10 @@ const std::string	&IRCUser::getModestr()
 {
 	mode_str.clear();
 	mode_str = "+";
-	for (std::map<enum IRCUserModes, const char>::iterator it = flags_enum.begin(); it != flags_enum.end(); ++it)
+	for (IRCUserModesMap::iterator it = flags_enum.begin(); it != flags_enum.end(); ++it)
 	{
-        if(usermodes & it->first)
-			mode_str += it->second;
+        if(usermodes & it->second)
+			mode_str += it->first;
     }
 	return (mode_str);
 }
