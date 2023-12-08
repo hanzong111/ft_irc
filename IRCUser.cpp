@@ -7,6 +7,19 @@
 
 uint64_t IRCUser::count = 0;
 
+IRCUserModesMap IRCUser::flags_enum;
+
+void	populateModeMap(IRCUserModesMap &map)
+{
+	map.insert(std::make_pair(AWAY, 'a'));
+	map.insert(std::make_pair(RESTRICTED,'r'));
+	map.insert(std::make_pair(WALLOPS,'w'));
+	map.insert(std::make_pair(INVISIBLE,'i'));
+	map.insert(std::make_pair(OPER,'o'));
+	map.insert(std::make_pair(LOCAL_OPER,'O'));
+	map.insert(std::make_pair(SERVER_NOTICES,'s'));
+}
+
 IRCUser::IRCUser(const IRCServer &server) :
 	TCPConn(server),
 	is_authenticated(false),
@@ -17,13 +30,8 @@ IRCUser::IRCUser(const IRCServer &server) :
 	std::ostringstream os;
 	os << IRCUSER_DEFAULT_NICK_PREFIX << count++;
 	nickname = os.str();
-	flags_enum.insert(std::make_pair(AWAY, 'a'));
-	flags_enum.insert(std::make_pair(RESTRICTED,'r'));
-	flags_enum.insert(std::make_pair(WALLOPS,'w'));
-	flags_enum.insert(std::make_pair(INVISIBLE,'i'));
-	flags_enum.insert(std::make_pair(OPER,'o'));
-	flags_enum.insert(std::make_pair(LOCAL_OPER,'O'));
-	flags_enum.insert(std::make_pair(SERVER_NOTICES,'s'));
+	if (flags_enum.empty())
+		populateModeMap(flags_enum);
 }
 
 IRCUser::IRCUser(const TCPServer<IRCUser> &server) :
@@ -36,13 +44,8 @@ IRCUser::IRCUser(const TCPServer<IRCUser> &server) :
 	std::ostringstream os;
 	os << IRCUSER_DEFAULT_NICK_PREFIX << count++;
 	nickname = os.str();
-	flags_enum.insert(std::make_pair(AWAY, 'a'));
-	flags_enum.insert(std::make_pair(RESTRICTED,'r'));
-	flags_enum.insert(std::make_pair(WALLOPS,'w'));
-	flags_enum.insert(std::make_pair(INVISIBLE,'i'));
-	flags_enum.insert(std::make_pair(OPER,'o'));
-	flags_enum.insert(std::make_pair(LOCAL_OPER,'O'));
-	flags_enum.insert(std::make_pair(SERVER_NOTICES,'s'));
+	if (flags_enum.empty())
+		populateModeMap(flags_enum);
 }
 
 IRCUser::IRCUser(const IRCUser &other) :
@@ -52,7 +55,6 @@ IRCUser::IRCUser(const IRCUser &other) :
 	is_registered(other.is_registered),
 	usermodes(other.usermodes),
 	mode_str(other.mode_str),
-	flags_enum(other.flags_enum),
 	nickname(other.nickname),
 	username(other.username),
 	real_name(other.real_name)

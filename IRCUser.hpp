@@ -22,6 +22,8 @@ typedef enum IRCUserModes
 	SERVER_NOTICES = 0x40
 } e_IRCUserModes;
 
+typedef std::map<enum IRCUserModes, const char> IRCUserModesMap;
+
 class IRCUser : public TCPConn
 {
 	public:
@@ -54,14 +56,14 @@ class IRCUser : public TCPConn
 
 	protected:
 		static uint64_t	count;
-		bool			is_authenticated;
-		bool			is_registered;
-		int				usermodes;
-		std::string		mode_str;
-		std::map<enum IRCUserModes, const char> flags_enum;
-		std::string		nickname;
-		std::string		username;
-		std::string		real_name;
+		bool					is_authenticated;
+		bool					is_registered;
+		int						usermodes;
+		static IRCUserModesMap	flags_enum;
+		std::string				mode_str;
+		std::string				nickname;
+		std::string				username;
+		std::string				real_name;
 };
 
 #endif
