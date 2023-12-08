@@ -302,7 +302,8 @@ void	IRCServer::handleOPER(IRCUser &user, const IRCMessage &msg)
 void	IRCServer::handleMODE(IRCUser &user, const IRCMessage &msg)
 {
 	std::string reply;
-	std::map<enum IRCUserModes, const char>::iterator flag;
+	IRCUserModesMap::iterator flag;
+	int			flag_requested = -1;
 
 	if (msg.params.size() < 1)
 		reply = ERR_NEEDMOREPARAMS(servername, user.getNickname(), msg.command);
@@ -314,29 +315,29 @@ void	IRCServer::handleMODE(IRCUser &user, const IRCMessage &msg)
 		reply = ERR_UMODEUNKNOWNFLAG(servername, user.getNickname());
 	else
 	{
-		flag = user.getFlag_map().end();
-		for (std::map<enum IRCUserModes, const char>::iterator it = user.getFlag_map().begin(); it != user.getFlag_map().end(); ++it)
+		try
 		{
-    		if(it->second == msg.params[1][1])
-				flag = it;
-    	}
-		if(flag == user.getFlag_map().end())
-			reply = ERR_UMODEUNKNOWNFLAG(servername, user.getNickname());
-		else
-		{
-			if(msg.params[1][0] == '+')
-			{
-				if(flag->second == 'o' || flag->second == 'O' || flag->second == 'a')
-					return;
-				user.setModeFlag(flag->first);
-			}
-			else if (msg.params[1][0] == '-')
-			{
-				if(flag->second == 'r')
-					return;
-				user.clearModeFlag(flag->first);
-			}
+			flag_requested = user.getFlag_map().at(msg.params[1][1]);
 		}
+		catch (const std::out_of_range &e)
+		{
+			reply = ERR_UMODEUNKNOWNFLAG(servername, user.getNickname());
+			user.queueSend(reply.c_str(), reply.size());
+			return ;
+		}
+		if(msg.params[1][0] == '+')
+		{
+			if(flag_requested == OPER || flag_requested == LOCAL_OPER || flag_requested == AWAY)
+				return;
+			user.setModeFlag(flag_requested);
+		}
+		else if (msg.params[1][0] == '-')
+		{
+			if(flag_requested == RESTRICTED)
+				return;
+			user.clearModeFlag(flag_requested);
+		}
+		flag = user.getFlag_map().end();
 	}
 	if (!reply.empty())
 	{
