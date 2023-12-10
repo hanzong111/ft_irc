@@ -25,7 +25,6 @@ class IRCChannel
 	typedef std::set<std::string> UsersList;
 
 	public:
-		typedef void (IRCChannel::*MemFuncPtr)(IRCUser &, const IRCMessage &);
 		IRCChannel(const std::string &channel_name);
 		IRCChannel(const IRCChannel &other);
 		virtual ~IRCChannel();
@@ -58,7 +57,6 @@ class IRCChannel
 		UsersList 									users;
 		UsersList 									muted_users;
 		UsersList 									banned_users;
-		std::map<std::string, MemFuncPtr>			chan_func_map;
 
 	//friend class IRCServer;
 };

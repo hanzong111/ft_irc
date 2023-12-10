@@ -15,9 +15,7 @@
 #include <ctime>
 #include <iostream>
 
-#define OPERATOR_PASS "1234"
-
-//std::map<std::string, IRCServer::MemFuncPtr> func_map;
+//std::map<std::string, IRCServer::MemFuncPtr> serv_func_map;
 
 IRCServer::IRCServer(const std::string &ip_addr, uint16_t port_num) :
 	TCPHost(),
@@ -25,16 +23,20 @@ IRCServer::IRCServer(const std::string &ip_addr, uint16_t port_num) :
 	servername(ip_addr),
 	time_created(IRCServer::getCurerntTimeAsStr())
 {
-	if (func_map.empty())
-		populateFuncMap();
+	if (serv_func_map.empty())
+		populateServFuncMap();
+	if (chan_func_map.empty())
+		populateChanFuncMap();
 }
 
 IRCServer::IRCServer(const IRCServer &other) :
 	TCPHost(),
 	TCPServer(other)
 {
-	if (func_map.empty())
-		populateFuncMap();
+	if (serv_func_map.empty())
+		populateServFuncMap();
+	if (chan_func_map.empty())
+		populateChanFuncMap();
 	*this = other;
 }
 
@@ -43,8 +45,10 @@ IRCServer &IRCServer::operator=(const IRCServer &other)
 	if (this == &other)
 		return (*this);
 	TCPServer::operator=(other);
-	if (func_map.empty())
-		populateFuncMap();
+	if (serv_func_map.empty())
+		populateServFuncMap();
+	if (chan_func_map.empty())
+		populateChanFuncMap();
 	conn_pass = other.conn_pass;
 	servername = other.servername;
 	channels = other.channels;
@@ -173,10 +177,7 @@ void	IRCServer::processCommands(IRCUser &user, const std::string &cmd)
 	// Retrieve function pointer
 
 	if(msg.for_Channel() == true && msg.command != "JOIN")
-	{
-		std::map<std::string, IRCChannel>::iterator it = channels.find("name");
-		it->second.Channel_commands(user, msg);
-	}
+		Channel_commands(user, msg);
 	else
 		Server_commands(user, msg);
 }
@@ -188,7 +189,7 @@ void	IRCServer::Server_commands(IRCUser &user,const IRCMessage &msg)
 
 	try
 	{
-		f = func_map.at(msg.command);
+		f = serv_func_map.at(msg.command);
 	}
 	catch (std::out_of_range &e)
 	{
@@ -210,224 +211,23 @@ void	IRCServer::updateUsersMap()
 		users_map[it->getNickname()] = ind++;
 }
 
-void	IRCServer::sendWelcomeMessages(IRCUser &user)
+void	IRCServer::populateServFuncMap()
 {
-	std::string	str;
-
-	// Send welcome messages
-	str = RPL_WELCOME(servername, user.getNickname(),
-		user.getUsername(), user.getRealName());
-	str += RPL_YOURHOST(servername, user.getNickname(), IRCSERVER_VER);
-	str += RPL_CREATED(servername, user.getNickname(), time_created);
-	str += RPL_MYINFO(servername, user.getNickname(),
-				IRCSERVER_VER,
-				IRCSERVER_SUPPORTED_USER_MODES,
-				IRCSERVER_SUPPORTED_CHANNEL_MODES);
-	user.queueSend(str.c_str(), str.size());
+	serv_func_map["PASS"] = &IRCServer::S_handlePASS;
+	serv_func_map["NICK"] = &IRCServer::S_handleNICK;
+	serv_func_map["USER"] = &IRCServer::S_handleUSER;
+	serv_func_map["OPER"] = &IRCServer::S_handleOPER;
+	serv_func_map["MODE"] = &IRCServer::S_handleMODE;
+	serv_func_map["QUIT"] = &IRCServer::S_handleQUIT;
+	serv_func_map["JOIN"] = &IRCServer::S_handleJOIN;
 }
 
-void	IRCServer::populateFuncMap()
+void	IRCServer::populateChanFuncMap()
 {
-	func_map["PASS"] = &IRCServer::handlePASS;
-	func_map["NICK"] = &IRCServer::handleNICK;
-	func_map["USER"] = &IRCServer::handleUSER;
-	func_map["OPER"] = &IRCServer::handleOPER;
-	func_map["MODE"] = &IRCServer::handleMODE;
-	func_map["QUIT"] = &IRCServer::handleQUIT;
-	func_map["JOIN"] = &IRCServer::handleJOIN;
-	func_map["WHO"] = &IRCServer::handleWHO;
+	chan_func_map["WHO"] = &IRCServer::C_handleWHO;
 }
 
-void	IRCServer::handlePASS(IRCUser &user, const IRCMessage &msg)
-{
-	std::string	reply;
-
-	if (msg.params.size() < 1)
-		reply = ERR_NEEDMOREPARAMS(servername, user.getNickname(), msg.command);
-	else if (user.isAuthenticated() && user.isRegistered())
-		reply = ERR_ALREADYREGISTRED(servername, user.getNickname());
-	else if (!(msg.params[0] == conn_pass))
-		reply = ERR_WRONGPASS(servername, user.getNickname(), msg.command);
-	if (!reply.empty())
-		user.queueSend(reply.c_str(), reply.size());
-	else if (msg.params[0] == conn_pass)
-		user.makeAuthenticated();
-}
-
-void	IRCServer::handleNICK(IRCUser &user, const IRCMessage &msg)
-{
-	std::string reply;
-
-	if (msg.params.size() < 1)
-		reply = ERR_NONICKNAMEGIVEN(servername, "*");
-	else if (!IRCUser::isValidNickname(msg.params[0]))
-		reply = ERR_ERRONEUSNICKNAME(servername, user.getNickname(), msg.params[0]);
-	else if (users_map.find(msg.params[0]) != users_map.end())
-		reply = ERR_NICKNAMEINUSE(servername, user.getNickname(), msg.params[0]);
-	else if (user.getModeFlags() & RESTRICTED)
-		reply = ERR_RESTRICTED(servername, user.getNickname());
-	if (!reply.empty())
-	{
-		user.queueSend(reply.c_str(), reply.size());
-		return ;
-	}
-
-	// Update IRCUser object
-	std::string old_nickname = user.getNickname();
-	user.changeNickname(msg.params[0]);
-	// Update `users_map`
-	size_t ind = users_map[old_nickname];
-	users_map.erase(old_nickname);
-	users_map[msg.params[0]] = ind;
-	// Check if registration is completed
-	if (!user.getUsername().empty())
-	{
-		user.makeRegistered();
-		sendWelcomeMessages(user);
-	}
-}
-
-void	IRCServer::handleUSER(IRCUser &user, const IRCMessage &msg)
-{
-	std::string reply;
-
-	if (msg.params.size() < 4)
-		reply = ERR_NEEDMOREPARAMS(servername, user.getNickname(), msg.command);
-	else if (user.isAuthenticated() && user.getUsername() != "")
-		reply = ERR_ALREADYREGISTRED(servername, user.getNickname());
-	if (!reply.empty())
-	{
-		user.queueSend(reply.c_str(), reply.size());
-		return ;
-	}
-	user.changeUsername(msg.params[0]);
-	user.changeRealName(msg.params[3]);
-	// It would be a good idea to check if the mode specified in the message
-	// is a single digit, but since there is no reply specified for invalid
-	// parameter in RFC2812, the check isn't performed here.
-	int	mode = std::atoi(msg.params[1].c_str()) & (WALLOPS | INVISIBLE);
-	user.setModeFlag(mode);
-	// Check if registration is completed
-	if (user.getNickname().find(IRCUSER_DEFAULT_NICK_PREFIX) != 0)
-	{
-		user.makeRegistered();
-		sendWelcomeMessages(user);
-	}
-}
-
-void	IRCServer::handleOPER(IRCUser &user, const IRCMessage &msg)
-{
-	std::string reply;
-
-	if (msg.params.size() < 2)
-		reply = ERR_NEEDMOREPARAMS(servername, user.getNickname(), msg.command);
-	else if (msg.params[1] != OPERATOR_PASS)
-		reply = ERR_PASSWDMISMATCH(servername, user.getNickname());
-	else
-	{
-		reply = RPL_YOUREOPER(servername, user.getNickname());
-		user.setModeFlag(OPER);
-	}
-	if (!reply.empty())
-	{
-		user.queueSend(reply.c_str(), reply.size());
-		return ;
-	}	
-}
-
-void	IRCServer::handleMODE(IRCUser &user, const IRCMessage &msg)
-{
-	std::string reply;
-	IRCUserModesMap::iterator flag;
-	int			flag_requested = -1;
-
-	if (msg.params.size() < 1)
-		reply = ERR_NEEDMOREPARAMS(servername, user.getNickname(), msg.command);
-	else if (user.getNickname() != msg.params[0])
-		reply = ERR_USERSDONTMATCH(servername, user.getNickname());
-	else if (msg.params.size() == 1)
-		reply = RPL_UMODEIS(servername, user.getNickname(), user.getModestr());
-	else if (msg.params[1].size() != 2 || !(msg.params[1][0] == '+' || msg.params[1][0] == '-'))
-		reply = ERR_UMODEUNKNOWNFLAG(servername, user.getNickname());
-	else
-	{
-		try
-		{
-			flag_requested = user.getFlag_map().at(msg.params[1][1]);
-		}
-		catch (const std::out_of_range &e)
-		{
-			reply = ERR_UMODEUNKNOWNFLAG(servername, user.getNickname());
-			user.queueSend(reply.c_str(), reply.size());
-			return ;
-		}
-		if(msg.params[1][0] == '+')
-		{
-			if(flag_requested == OPER || flag_requested == LOCAL_OPER || flag_requested == AWAY)
-				return;
-			user.setModeFlag(flag_requested);
-		}
-		else if (msg.params[1][0] == '-')
-		{
-			if(flag_requested == RESTRICTED)
-				return;
-			user.clearModeFlag(flag_requested);
-		}
-		flag = user.getFlag_map().end();
-	}
-	if (!reply.empty())
-	{
-		user.queueSend(reply.c_str(), reply.size());
-		return ;
-	}	
-}
-
-void	IRCServer::handleQUIT(IRCUser &user, const IRCMessage &msg)
-{
-	size_t		ind;
-	std::string	reply;
-
-	if (msg.params.size() != 1)
-		reply = ":" + user.getNickname() + "ERROR :" + msg.params[1] + "\r\n";
-	else
-		reply = ":" + user.getNickname() + "ERROR :\r\n";
-	if (!reply.empty())
-	{
-		user.queueSend(reply.c_str(), reply.size());
-		return ;
-	}
-	ind = users_map.at(user.getNickname());
-	users_map.erase(clients[ind].getNickname());
-	removeClient(clients[ind]);
-	updateUsersMap();
-}
-
-void	IRCServer::handleJOIN(IRCUser &user, const IRCMessage &msg)
-{
-	std::string	reply;
-	const std::string channelname = "#Try";
-
-	(void)msg;
-	if (msg.params[0] != channelname)
-		reply = ERR_NOSUCHCHANNEL(servername, user.getNickname(), msg.params[0]);
-	else
-	{
-		std::pair<std::map<std::string, IRCChannel>::iterator, bool> result = channels.insert(std::make_pair(channelname, channelname));
-		if (result.second) {
-        std::cout << "Channel #example added successfully." << std::endl;
-    } else {
-        std::cout << "Channel #example failed." << std::endl;
-    }
-		reply = ":" + user.getNickname() + " JOIN " + channelname + "\r\n";
-	}
-	if (!reply.empty())
-	{
-		user.queueSend(reply.c_str(), reply.size());
-		return ; 
-	}
-}
-
-void	IRCServer::handleWHO(IRCUser &user, const IRCMessage &msg)
+void	IRCServer::C_handleWHO(IRCUser &user, const IRCMessage &msg)
 {
 	(void)msg;
 	std::string reply = RPL_NAMREPLY(servername, user.getNickname(), "=", "Try", "Hanz Henr Zoe");

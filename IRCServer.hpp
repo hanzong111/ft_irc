@@ -7,6 +7,8 @@
 # include <netinet/in.h>
 # include <string>
 # include <vector>
+# include <iostream>
+# include <sstream>
 # include <map>
 # include <set>
 
@@ -23,6 +25,8 @@
 # define MAGENTA	 "\033[0;95m"
 # define CYAN    	 "\033[0;96m"
 # define WHITE    	 "\033[0;97m"
+
+#define SERVER_OPERATOR_PASS "1234"
 
 class IRCMessage;
 class IRCUser;
@@ -47,22 +51,30 @@ class IRCServer : virtual public TCPServer<IRCUser>
 		size_t	handlePollIn(size_t ind);
 		size_t	handlePollOut(size_t ind);
 		void	processCommands(IRCUser &user,const std::string &cmd);
-		void	Server_commands(IRCUser &user,const IRCMessage &cmd);
-		void	populateFuncMap();
+		void	populateServFuncMap();
+		void	populateChanFuncMap();
 		bool	addUser();
 		void	updateUsersMap();
 		void	sendWelcomeMessages(IRCUser &user);
-		void	handlePASS(IRCUser &user, const IRCMessage &msg);
-		void	handleNICK(IRCUser &user, const IRCMessage &msg);
-		void	handleUSER(IRCUser &user, const IRCMessage &msg);
-		void	handleOPER(IRCUser &user, const IRCMessage &msg);
-		void	handleMODE(IRCUser &user, const IRCMessage &msg);
-		void	handleQUIT(IRCUser &user, const IRCMessage &msg);
-		void	handleJOIN(IRCUser &user, const IRCMessage &msg);
-		void	handleWHO(IRCUser &user, const IRCMessage &msg);
+
+		void	Server_commands(IRCUser &user,const IRCMessage &cmd);
+		void	Channel_commands(IRCUser &user, const IRCMessage &msg);
+
+		/*	Server Commands		*/
+		void	S_handlePASS(IRCUser &user, const IRCMessage &msg);
+		void	S_handleNICK(IRCUser &user, const IRCMessage &msg);
+		void	S_handleUSER(IRCUser &user, const IRCMessage &msg);
+		void	S_handleOPER(IRCUser &user, const IRCMessage &msg);
+		void	S_handleMODE(IRCUser &user, const IRCMessage &msg);
+		void	S_handleQUIT(IRCUser &user, const IRCMessage &msg);
+		void	S_handleJOIN(IRCUser &user, const IRCMessage &msg);
+
+		/*	Channel Commands	*/
+		void	C_handleWHO(IRCUser &user, const IRCMessage &msg);
 
 
-		std::map<std::string, MemFuncPtr>			func_map;
+		std::map<std::string, MemFuncPtr>			serv_func_map;
+		std::map<std::string, MemFuncPtr>			chan_func_map;
 		// `users_map` maps username to index in `clients`
 		std::map<std::string, size_t>				users_map;
 		std::map<std::string, IRCChannel>			channels;

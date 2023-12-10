@@ -1,0 +1,27 @@
+void	IRCServer::S_handleJOIN(IRCUser &user, const IRCMessage &msg)
+{
+	std::string	reply;
+	const std::string channelname = "#Try";
+
+	(void)msg;
+	if (msg.params[0] != channelname)
+		reply = ERR_NOSUCHCHANNEL(servername, user.getNickname(), msg.params[0]);
+	else
+	{
+		try
+		{
+			channels.at(channelname).addUser(user.getNickname());
+		}
+		catch (const std::out_of_range &e)
+		{
+			channels.insert(std::make_pair(channelname, IRCChannel(channelname)));
+			channels.at(channelname).addUser(user.getNickname());
+		}
+		reply = ":" + user.getNickname() + " JOIN " + channelname + "\r\n";
+	}
+	if (!reply.empty())
+	{
+		user.queueSend(reply.c_str(), reply.size());
+		return ; 
+	}
+}
