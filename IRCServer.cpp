@@ -412,12 +412,15 @@ void	IRCServer::handleJOIN(IRCUser &user, const IRCMessage &msg)
 		reply = ERR_NOSUCHCHANNEL(servername, user.getNickname(), msg.params[0]);
 	else
 	{
-		std::pair<std::map<std::string, IRCChannel>::iterator, bool> result = channels.insert(std::make_pair(channelname, channelname));
-		if (result.second) {
-        std::cout << "Channel #example added successfully." << std::endl;
-    } else {
-        std::cout << "Channel #example failed." << std::endl;
-    }
+		try
+		{
+			channels.at(channelname).addUser(user.getNickname());
+		}
+		catch (const std::out_of_range &e)
+		{
+			channels.insert(std::make_pair(channelname, IRCChannel(channelname)));
+			channels.at(channelname).addUser(user.getNickname());
+		}
 		reply = ":" + user.getNickname() + " JOIN " + channelname + "\r\n";
 	}
 	if (!reply.empty())

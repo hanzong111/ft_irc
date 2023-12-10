@@ -15,12 +15,15 @@ IRCChannel::IRCChannel(const IRCChannel &other) :
 	muted_users(other.muted_users),
 	banned_users(other.banned_users)
 {
-	// topic = new std::string(*(other.topic));
+	if (other.topic != NULL)
+		topic = new std::string(*(other.topic));
+	else
+		topic = NULL;
 }
 
 IRCChannel::~IRCChannel()
 {
-	// delete (topic);
+	delete (topic);
 }
 
 const std::string	&IRCChannel::getName() const throw()
