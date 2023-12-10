@@ -2,9 +2,11 @@
 #include <string>
 #include <vector>
 #include <cctype>
+# include <iostream>
 
 IRCMessage::IRCMessage() :
-	is_valid(true)
+	is_valid(true),
+	for_channel(false)
 {}
 
 IRCMessage::IRCMessage(const std::string &msg) :
@@ -47,6 +49,8 @@ IRCMessage::IRCMessage(const std::string &msg) :
 	}
 	if (ind != msg_len)
 		is_valid = false;
+	if (params[0][0] == '#' || params[0][0] == '&' || params[0][0] == '+' || params[0][0] == '!')
+		for_channel = true;
 }
 
 IRCMessage::IRCMessage(const IRCMessage &other)
@@ -62,6 +66,7 @@ IRCMessage &IRCMessage::operator=(const IRCMessage &other)
 	command = other.command;
 	params = other.params;
 	is_valid = other.is_valid;
+	for_channel = other.for_channel;
 	return (*this);
 }
 
@@ -104,4 +109,9 @@ size_t	IRCMessage::getTokenLen(const std::string &token, size_t pos,
 bool	IRCMessage::isValid() const throw()
 {
 	return (is_valid);
+}
+
+bool	IRCMessage::for_Channel() const throw()
+{
+	return (for_channel);
 }

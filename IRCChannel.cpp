@@ -15,12 +15,12 @@ IRCChannel::IRCChannel(const IRCChannel &other) :
 	muted_users(other.muted_users),
 	banned_users(other.banned_users)
 {
-	topic = new std::string(*(other.topic));
+	// topic = new std::string(*(other.topic));
 }
 
 IRCChannel::~IRCChannel()
 {
-	delete (topic);
+	// delete (topic);
 }
 
 const std::string	&IRCChannel::getName() const throw()
@@ -99,4 +99,24 @@ void	IRCChannel::setModeFlag(int flag)
 void	IRCChannel::clearModeFlag(int flag)
 {
 	modes &= ~flag;
+}
+
+void	IRCChannel::Channel_commands(IRCUser &user, const IRCMessage &msg)
+{
+	std::cout << RED << "inside Channel Commands" << DEF_COLOR << std::endl;
+	(void)user;
+	(void)msg;
+	// MemFuncPtr	f;
+
+	// try
+	// {
+	// 	f = chan_func_map.at(msg.command);
+	// }
+	// catch (std::out_of_range &e)
+	// {
+	// 	std::cerr << "Warning: Invalid command (" << msg.command << ")" << std::endl;
+	// 	return ;
+	// }
+	// // Call function
+	// (this->*f)(user, msg);
 }

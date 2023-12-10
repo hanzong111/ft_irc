@@ -39,168 +39,33 @@
     std::string(":") + server + " " + numeric_code + " " + target
 
 //---------------------------------RPL_WELCOME--------------------------------//
-/* Usage:
- * RPL_YOURHOST(servername, nickname, username, hostname)
- */
-# define RPL_WELCOME(server, nickname, username, hostname) \
-    IRC_RPL("001", server, nickname) + " :Welcome to the IRC network, " \
-		+ nickname + "!" + username + "@" + hostname + "\r\n"
-//------------------------------END OF SECTION--------------------------------//
 
-//--------------------------------RPL_YOURHOST--------------------------------//
-/* Usage:
- * RPL_YOURHOST(servername, nickname, version_str)
- */
-# define RPL_YOURHOST(server, target, version) \
-    IRC_RPL("002", server, target) + " :Your host is " + server + ", running" \
-		+ " version " + version + "\r\n"
-//------------------------------END OF SECTION--------------------------------//
+/*  handlePASS  */
+# define RPL_WELCOME(server, nickname, username, hostname) IRC_RPL("001", server, nickname) + " :Welcome to the IRC network, " + nickname + "!" + username + "@" + hostname + "\r\n"
+# define RPL_YOURHOST(server, target, version) IRC_RPL("002", server, target) + " :Your host is " + server + ", running" + " version " + version + "\r\n"
+# define RPL_CREATED(server, target, date) IRC_RPL("003", server, target) + " :This server was created " + date + "\r\n"
+# define RPL_MYINFO(server, target, version, usermodes, channelmodes) IRC_RPL("004", server, target) + " " + server + " " + version + " " + usermodes + " " + channelmodes + "\r\n"
+# define RPL_NOTOPIC(server, target, channel_name) IRC_RPL("331", server, target) + " " + channel_name + " :No topic is set\r\n"
+# define RPL_TOPIC(server, target, channel_name, topic_str) IRC_RPL("332", server, target) + " " + channel_name + " :" + topic_str \"\r\n"
+/*  handleNICK  */
+# define ERR_NONICKNAMEGIVEN(server, target) IRC_RPL("431", server, target) + " :No nickname given\r\n"
+# define ERR_ERRONEUSNICKNAME(server, target, requested_nickname) IRC_RPL("432", server, target) + " " + requested_nickname + " :Erroneous nickname\r\n"
+# define ERR_NICKNAMEINUSE(server, target, requested_nickname) IRC_RPL("433", server, target) + " " + requested_nickname + " :Nickname is already in use\r\n"
+# define ERR_UNAVAILRESOURCE(server, target, param) IRC_RPL("437", server, target) + " " param + " :Nick/channel is temporarily unavailable\r\n"
+# define ERR_RESTRICTED(server, target) IRC_RPL("484", server, target) + " :Your connection is restricted!\r\n"
+# define ERR_WRONGPASS(server, target, command) IRC_RPL("999", server, target) + " " + command + " :Wrong Password\r\n"
+/*  handleOPER  */
+# define ERR_NEEDMOREPARAMS(server, target, command) IRC_RPL("461", server, target) + " " + command + " :Not enough parameters\r\n"
+# define ERR_ALREADYREGISTRED(server, target) IRC_RPL("462", server, target) + " :Unauthorized command " + "(already registered)\r\n"
+# define RPL_YOUREOPER(server, target) IRC_RPL("381", server, target) + " :You are now an IRC operator\r\n"
+# define ERR_PASSWDMISMATCH(server, target) IRC_RPL("464", server, target) + " :Password incorrect\r\n"
+/*  handleMODE  */
+# define ERR_USERSDONTMATCH(server, target) IRC_RPL("502", server, target) + " :Cannot change mode for other users\r\n"
+# define RPL_UMODEIS(server, target, mode) IRC_RPL("221", server, target) + " " + mode + "\r\n"
+# define ERR_UMODEUNKNOWNFLAG(server, target) IRC_RPL("501", server, target) + " :Unknown MODE flag\r\n"
+/*  handleJOIN  */
+# define ERR_NOSUCHCHANNEL(server, target, channelname) IRC_RPL("403", server, target) + channelname + " :No such channel\r\n"
+# define RPL_REASONQUIT(server, target) IRC_RPL("501", server, target) + "QUIT : With no reason\r\n"
 
-//---------------------------------RPL_CREATED--------------------------------//
-/* Usage:
- * RPL_CREATED(servername, nickname, date_str)
- */
-# define RPL_CREATED(server, target, date) \
-    IRC_RPL("003", server, target) + " :This server was created " + date \
-        + "\r\n"
-//------------------------------END OF SECTION--------------------------------//
-
-//---------------------------------RPL_MYINFO---------------------------------//
-/* Usage:
- * RPL_MYINFO(servername, nickname, version_str, usermodes, channelmodes)
- */
-# define RPL_MYINFO(server, target, version, usermodes, channelmodes) \
-    IRC_RPL("004", server, target) + " " + server + " " + version + " " \
-		+ usermodes + " " + channelmodes + "\r\n"
-//------------------------------END OF SECTION--------------------------------//
-
-//---------------------------------RPL_NOTOPIC--------------------------------//
-/* Usage:
- * RPL_NOTOPIC(servername, nickname, channel_name)
- */
-# define RPL_NOTOPIC(server, target, channel_name) \
-    IRC_RPL("331", server, target) + " " + channel_name \
-        + " :No topic is set\r\n"
-//------------------------------END OF SECTION--------------------------------//
-
-//----------------------------------RPL_TOPIC---------------------------------//
-/* Usage:
- * RPL_TOPIC(servername, nickname, channel_name, topic_str)
- */
-# define RPL_TOPIC(server, target, channel_name, topic_str) \
-    IRC_RPL("332", server, target) + " " + channel_name + " :" + topic_str \
-         + "\r\n"
-//------------------------------END OF SECTION--------------------------------//
-
-//-----------------------------ERR_NONICKNAMEGIVEN----------------------------//
-/* Usage:
- * ERR_NONICKNAMEGIVEN(servername, nickname)
- */
-# define ERR_NONICKNAMEGIVEN(server, target) \
-    IRC_RPL("431", server, target) + " :No nickname given\r\n"
-//------------------------------END OF SECTION--------------------------------//
-
-//----------------------------ERR_ERRONEUSNICKNAME----------------------------//
-/* Usage:
- * ERR_ERRONEUSNICKNAME(servername, nickname, requested_nickname)
- */
-# define ERR_ERRONEUSNICKNAME(server, target, requested_nickname) \
-    IRC_RPL("432", server, target) + " " + requested_nickname \
-        + " :Erroneous nickname\r\n"
-//------------------------------END OF SECTION--------------------------------//
-
-//------------------------------ERR_NICKNAMEINUSE-----------------------------//
-/* Usage:
- * ERR_NICKNAMEINUSE(servername, nickname, requested_nickname)
- */
-# define ERR_NICKNAMEINUSE(server, target, requested_nickname) \
-    IRC_RPL("433", server, target) + " " + requested_nickname \
-        + " :Nickname is already in use\r\n"
-//------------------------------END OF SECTION--------------------------------//
-
-//-----------------------------ERR_UNAVAILRESOURCE----------------------------//
-/* Usage:
- * ERR_UNAVAILRESOURCE(servername, nickname, param)
- */
-# define ERR_UNAVAILRESOURCE(server, target, param) \
-    IRC_RPL("437", server, target) + " " param \
-        + " :Nick/channel is temporarily unavailable\r\n"
-//------------------------------END OF SECTION--------------------------------//
-
-//-------------------------------ERR_RESTRICTED-------------------------------//
-/* Usage:
- * ERR_RESTRICTED(servername, nickname)
- */
-# define ERR_RESTRICTED(server, target) \
-    IRC_RPL("484", server, target) + " :Your connection is restricted!\r\n"
-//------------------------------END OF SECTION--------------------------------//
-
-//-----------------------------ERR_WRONGPASS-----------------------------//
-/* Usage:
- * ERR_WRONGPASS(servername, nickname, command)
- */
-# define ERR_WRONGPASS(server, target, command) \
-    IRC_RPL("999", server, target) + " " + command \
-        + " :Wrong Password\r\n"
-//------------------------------END OF SECTION--------------------------------//
-
-//-----------------------------ERR_NEEDMOREPARAMS-----------------------------//
-/* Usage:
- * ERR_NEEDMOREPARAMS(servername, nickname, command)
- */
-# define ERR_NEEDMOREPARAMS(server, target, command) \
-    IRC_RPL("461", server, target) + " " + command \
-        + " :Not enough parameters\r\n"
-//------------------------------END OF SECTION--------------------------------//
-
-//----------------------------ERR_ALREADYREGISTRED----------------------------//
-/* Usage:
- * ERR_ALREADYREGISTRED(servername, nickname)
- */
-# define ERR_ALREADYREGISTRED(server, target) \
-    IRC_RPL("462", server, target) + " :Unauthorized command " \
-		+ "(already registered)\r\n"
-//------------------------------END OF SECTION--------------------------------//
-
-//-----------------------------RPL_YOUREOPER-----------------------------//
-/* Usage:
- * RPL_YOUREOPER(servername, nickname, command)
- */
-# define RPL_YOUREOPER(server, target) \
-    IRC_RPL("381", server, target) + " :You are now an IRC operator\r\n"
-//------------------------------END OF SECTION--------------------------------//
-
-//-----------------------------ERR_PASSWDMISMATCH-----------------------------//
-/* Usage:
- * ERR_PASSWDMISMATCH(servername, nickname, command)
- */
-# define ERR_PASSWDMISMATCH(server, target) \
-    IRC_RPL("464", server, target) + " :Password incorrect\r\n"
-//------------------------------END OF SECTION--------------------------------//
-
-//-----------------------------ERR_USERSDONTMATCH-----------------------------//
-/* Usage:
- * ERR_USERSDONTMATCH(servername, nickname, command)
- */
-# define ERR_USERSDONTMATCH(server, target) \
-    IRC_RPL("502", server, target) + " :Cannot change mode for other users\r\n"
-//------------------------------END OF SECTION--------------------------------//
-
-//-----------------------------RPL_UMODEIS-----------------------------//
-/* Usage:
- * RPL_UMODEIS(servername, nickname, mode)
- */
-# define RPL_UMODEIS(server, target, mode) \
-    IRC_RPL("221", server, target) + " " + mode \
-        + "\r\n"
-//------------------------------END OF SECTION--------------------------------//
-
-//-----------------------------ERR_UMODEUNKNOWNFLAG-----------------------------//
-/* Usage:
- * ERR_UMODEUNKNOWNFLAG(servername, nickname, command)
- */
-# define ERR_UMODEUNKNOWNFLAG(server, target) \
-    IRC_RPL("501", server, target) + " :Unknown MODE flag\r\n"
-//------------------------------END OF SECTION--------------------------------//
-
+# define RPL_NAMREPLY(server, target, symbol, channel, list_of_nicks) (IRC_RPL("353", server, target) + " " + symbol + " #" + channel + " :" + list_of_nicks + "\r\n")
 #endif

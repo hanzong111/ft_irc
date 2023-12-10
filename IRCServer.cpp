@@ -143,15 +143,49 @@ size_t	IRCServer::handlePollOut(size_t ind)
 	return (n_bytes_send);
 }
 
+void	print_client_cmd(IRCMessage &msg)
+{
+	static int	count = 0;
+
+	count++;
+	std::cout << RED << count << std::endl;
+	std::cout << GREEN;
+	std::cout << "prefix :" + msg.prefix << std::endl;
+	std::cout << BLUE;
+	std::cout << "command :" + msg.command << std::endl;
+	std::cout << YELLOW;
+	int	i = 0;
+	for (std::vector<std::string>::iterator it = msg.params.begin(); it != msg.params.end(); ++it) {
+		i++;
+        std::cout << "arg[" << i << "] : " << *it << "\n";
+    }
+	std::cout << DEF_COLOR;
+}
+
 void	IRCServer::processCommands(IRCUser &user, const std::string &cmd)
 {
 	// Parse message
 	IRCMessage	msg(cmd);
+	print_client_cmd(msg);
 	// Check authentication status
 	if (!conn_pass.empty() && !user.isAuthenticated() && msg.command != "PASS")
 		return ;
 	// Retrieve function pointer
+
+	if(msg.for_Channel() == true && msg.command != "JOIN")
+	{
+		std::map<std::string, IRCChannel>::iterator it = channels.find("name");
+		it->second.Channel_commands(user, msg);
+	}
+	else
+		Server_commands(user, msg);
+}
+
+void	IRCServer::Server_commands(IRCUser &user,const IRCMessage &msg)
+{
+	std::cout << RED << "inside Server Commands" << DEF_COLOR << std::endl;
 	MemFuncPtr	f;
+
 	try
 	{
 		f = func_map.at(msg.command);
@@ -161,7 +195,6 @@ void	IRCServer::processCommands(IRCUser &user, const std::string &cmd)
 		std::cerr << "Warning: Invalid command (" << msg.command << ")" << std::endl;
 		return ;
 	}
-	// Call function
 	(this->*f)(user, msg);
 }
 
@@ -200,6 +233,9 @@ void	IRCServer::populateFuncMap()
 	func_map["USER"] = &IRCServer::handleUSER;
 	func_map["OPER"] = &IRCServer::handleOPER;
 	func_map["MODE"] = &IRCServer::handleMODE;
+	func_map["QUIT"] = &IRCServer::handleQUIT;
+	func_map["JOIN"] = &IRCServer::handleJOIN;
+	func_map["WHO"] = &IRCServer::handleWHO;
 }
 
 void	IRCServer::handlePASS(IRCUser &user, const IRCMessage &msg)
@@ -349,12 +385,53 @@ void	IRCServer::handleMODE(IRCUser &user, const IRCMessage &msg)
 void	IRCServer::handleQUIT(IRCUser &user, const IRCMessage &msg)
 {
 	size_t		ind;
-	
-	(void)msg;
-	ind = users_map.at(user.getUsername());
+	std::string	reply;
+
+	if (msg.params.size() != 1)
+		reply = ":" + user.getNickname() + "ERROR :" + msg.params[1] + "\r\n";
+	else
+		reply = ":" + user.getNickname() + "ERROR :\r\n";
+	if (!reply.empty())
+	{
+		user.queueSend(reply.c_str(), reply.size());
+		return ;
+	}
+	ind = users_map.at(user.getNickname());
 	users_map.erase(clients[ind].getNickname());
 	removeClient(clients[ind]);
 	updateUsersMap();
+}
+
+void	IRCServer::handleJOIN(IRCUser &user, const IRCMessage &msg)
+{
+	std::string	reply;
+	const std::string channelname = "#Try";
+
+	(void)msg;
+	if (msg.params[0] != channelname)
+		reply = ERR_NOSUCHCHANNEL(servername, user.getNickname(), msg.params[0]);
+	else
+	{
+		std::pair<std::map<std::string, IRCChannel>::iterator, bool> result = channels.insert(std::make_pair(channelname, channelname));
+		if (result.second) {
+        std::cout << "Channel #example added successfully." << std::endl;
+    } else {
+        std::cout << "Channel #example failed." << std::endl;
+    }
+		reply = ":" + user.getNickname() + " JOIN " + channelname + "\r\n";
+	}
+	if (!reply.empty())
+	{
+		user.queueSend(reply.c_str(), reply.size());
+		return ; 
+	}
+}
+
+void	IRCServer::handleWHO(IRCUser &user, const IRCMessage &msg)
+{
+	(void)msg;
+	std::string reply = RPL_NAMREPLY(servername, user.getNickname(), "=", "Try", "Hanz Henr Zoe");
+	user.queueSend(reply.c_str(), reply.size());
 }
 
 std::string	IRCServer::getCurerntTimeAsStr()

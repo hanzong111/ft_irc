@@ -16,6 +16,7 @@ class IRCMessage
 		size_t	getTokenLen(const std::string &token, size_t pos,
 					const std::string &terminator_set) const throw();
 		bool	isValid() const throw();
+		bool 	for_Channel() const throw();
 
 		std::string					prefix;
 		std::string 				command;
@@ -23,6 +24,7 @@ class IRCMessage
 
 	private:
 		bool	is_valid;
+		bool	for_channel;
 };
 
 #endif

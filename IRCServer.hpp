@@ -14,6 +14,16 @@
 # define IRCSERVER_SUPPORTED_USER_MODES "iroO"
 # define IRCSERVER_SUPPORTED_CHANNEL_MODES "Oov"
 
+# define DEF_COLOR	 "\033[0;39m"
+# define GRAY     	 "\033[0;90m"
+# define RED    	 "\033[0;91m"
+# define GREEN    	 "\033[0;92m"
+# define YELLOW    	 "\033[0;93m"
+# define BLUE    	 "\033[0;94m"
+# define MAGENTA	 "\033[0;95m"
+# define CYAN    	 "\033[0;96m"
+# define WHITE    	 "\033[0;97m"
+
 class IRCMessage;
 class IRCUser;
 
@@ -37,6 +47,7 @@ class IRCServer : virtual public TCPServer<IRCUser>
 		size_t	handlePollIn(size_t ind);
 		size_t	handlePollOut(size_t ind);
 		void	processCommands(IRCUser &user,const std::string &cmd);
+		void	Server_commands(IRCUser &user,const IRCMessage &cmd);
 		void	populateFuncMap();
 		bool	addUser();
 		void	updateUsersMap();
@@ -47,6 +58,9 @@ class IRCServer : virtual public TCPServer<IRCUser>
 		void	handleOPER(IRCUser &user, const IRCMessage &msg);
 		void	handleMODE(IRCUser &user, const IRCMessage &msg);
 		void	handleQUIT(IRCUser &user, const IRCMessage &msg);
+		void	handleJOIN(IRCUser &user, const IRCMessage &msg);
+		void	handleWHO(IRCUser &user, const IRCMessage &msg);
+
 
 		std::map<std::string, MemFuncPtr>			func_map;
 		// `users_map` maps username to index in `clients`
