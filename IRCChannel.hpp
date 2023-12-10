@@ -26,6 +26,7 @@ class IRCChannel
 
 	public:
 		IRCChannel(const std::string &channel_name);
+		IRCChannel(const std::string &channel_name, const std::string &channel_key);
 		IRCChannel(const IRCChannel &other);
 		virtual ~IRCChannel();
 
@@ -54,6 +55,7 @@ class IRCChannel
 		int											modes;
 		const std::string							name;
 		std::string									*topic;
+		std::string									key;
 		UsersList 									users;
 		UsersList 									muted_users;
 		UsersList 									banned_users;

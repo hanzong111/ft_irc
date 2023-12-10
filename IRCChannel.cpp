@@ -5,12 +5,21 @@
 IRCChannel::IRCChannel(const std::string &channel_name) :
 	modes(0),
 	name(channel_name),
-	topic(NULL)
+	topic(NULL),
+	key(NULL)
 {}
 
+IRCChannel::IRCChannel(const std::string &channel_name, const std::string &channel_key) :
+	modes(0),
+	name(channel_name),
+	topic(NULL),
+	key(channel_key)
+{
+}
 IRCChannel::IRCChannel(const IRCChannel &other) :
 	modes(other.modes),
 	name(other.name),
+	key(other.key),
 	users(other.users),
 	muted_users(other.muted_users),
 	banned_users(other.banned_users)

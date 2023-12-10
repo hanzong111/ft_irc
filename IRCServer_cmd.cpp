@@ -216,19 +216,32 @@ void	make_channelandkeys(std::map<std::string , std::string> *channels_and_keys,
 	}
 }
 
+void	IRCServer::create_channel(std::string channel_name, std::string channel_key)
+{
+	IRCChannel newchannel(channel_name, channel_key);
+	channels.insert(std::make_pair(channel_name, newchannel));
+}
+
 void	IRCServer::S_handleJOIN(IRCUser &user, const IRCMessage &msg)
 {
 	(void)user;
-	std::string	reply;
-	std::map<std::string , std::string>	channels_and_keys;
+	std::string										reply;
+	std::map<std::string , std::string>				channels_and_keys;
+	std::map<std::string, std::string>::iterator 	it;
+	std::map<std::string, IRCChannel>::iterator 	find_channel;
 
 	make_channelandkeys(&channels_and_keys, msg);
-	//  std::map<std::string, std::string>::iterator it;
-
-	//  for (it = channels_and_keys.begin(); it != channels_and_keys.end(); ++it) {
-    //     std::cout << "Channel: " << it->first << ", Key: " << it->second << std::endl;
-    // }
-	// std::cout << "end" << std::endl;
+	for (it = channels_and_keys.begin(); it != channels_and_keys.end(); ++it) 
+	{
+		find_channel = channels.find(it->first);
+        if(find_channel == channels.end())
+			create_channel(it->first, it->second);
+		// 	join_channel();
+    }
+	for (find_channel = channels.begin(); find_channel != channels.end(); ++find_channel) 
+	{
+		std::cout << find_channel->first <<  std::endl;
+    }
 
 
 }
