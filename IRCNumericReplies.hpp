@@ -65,7 +65,6 @@
 # define ERR_UMODEUNKNOWNFLAG(server, target) IRC_RPL("501", server, target) + " :Unknown MODE flag\r\n"
 /*  handleJOIN  */
 # define ERR_NOSUCHCHANNEL(server, target, channelname) IRC_RPL("403", server, target) + channelname + " :No such channel\r\n"
-# define RPL_REASONQUIT(server, target) IRC_RPL("501", server, target) + "QUIT : With no reason\r\n"
-
+# define ERR_BADCHANNELKEY(server, target, channelname) IRC_RPL("475", server, target) + channelname + " :Cannot join channel (+k)\r\n"
 # define RPL_NAMREPLY(server, target, symbol, channel, list_of_nicks) (IRC_RPL("353", server, target) + " " + symbol + " #" + channel + " :" + list_of_nicks + "\r\n")
 #endif

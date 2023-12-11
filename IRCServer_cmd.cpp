@@ -216,10 +216,41 @@ void	make_channelandkeys(std::map<std::string , std::string> *channels_and_keys,
 	}
 }
 
-void	IRCServer::create_channel(std::string channel_name, std::string channel_key)
+void	IRCServer::create_channel(IRCUser &user, const IRCMessage &msg, std::map<std::string, std::string>::iterator 	it, std::string *reply)
 {
+	std::string 									channel_name = it->first;
+	std::string 									channel_key = it->second;
+	std::map<std::string, IRCChannel>::iterator		find;
+
+
+	if(!(channel_name[0] == '+' || channel_name[0] == '!' || channel_name[0] == '#' || channel_name[0] == '&'))
+	{
+		*reply = ERR_NOSUCHCHANNEL(servername, user.getNickname(), channel_name);
+		return ;
+	}
+	if(isChanneltaken(channel_name))
+	{
+		*reply = ERR_NOSUCHCHANNEL(servername, user.getNickname(), channel_name);
+		return ;
+	}
 	IRCChannel newchannel(channel_name, channel_key);
 	channels.insert(std::make_pair(channel_name, newchannel));
+	find = channels.find(channel_name);
+	std::cout << GREEN << "Succesfully created Channel[" + find->first + "]" + DEF_COLOR << std::endl;
+	join_channel(user, msg, find->second);
+}
+
+void	IRCServer::join_channel(IRCUser &user, const IRCMessage &msg, IRCChannel &channel)
+{
+	(void)msg;
+	std::string	reply;
+	if(channel.isUserBanned(user.getNickname()))
+	{
+		reply = ERR_BADCHANNELKEY(servername, user.getNickname(), channel.getName());
+		user.queueSend(reply.c_str(), reply.size());
+		return;
+	}
+		std::cout << GREEN << "Checking Keys  " << DEF_COLOR << std::endl;
 }
 
 void	IRCServer::S_handleJOIN(IRCUser &user, const IRCMessage &msg)
@@ -235,13 +266,23 @@ void	IRCServer::S_handleJOIN(IRCUser &user, const IRCMessage &msg)
 	{
 		find_channel = channels.find(it->first);
         if(find_channel == channels.end())
-			create_channel(it->first, it->second);
-		// 	join_channel();
+		{
+			if(user.getModeFlags() & OPER)
+				create_channel(user, msg, it, &reply);
+			else
+				reply = ERR_NOSUCHCHANNEL(servername, user.getNickname(), it->first);
+		}
+		else
+			join_channel(user, msg, find_channel->second);
+		if (!reply.empty())
+			user.queueSend(reply.c_str(), reply.size());
     }
-	for (find_channel = channels.begin(); find_channel != channels.end(); ++find_channel) 
-	{
-		std::cout << find_channel->first <<  std::endl;
-    }
+	// for (find_channel = channels.begin(); find_channel != channels.end(); ++find_channel) 
+	// {
+	// 	std::cout << "Channel_Name:" + find_channel->second.getName() <<  std::endl;
+	// 	if (find_channel->second.getModeFlags() & C_KEY)
+	// 		std::cout << "Key :" << find_channel->second.getKey() << std::endl;
+    // }
 
 
 }

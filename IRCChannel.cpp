@@ -2,29 +2,56 @@
 #include <string>
 #include <utility>
 
+IRCChannelModesMap IRCChannel::flags_enum;
+
+void	populateModeMap(IRCChannelModesMap &map)
+{
+	map['c'] = C_KEY;
+	map['l'] = C_LIMIT;
+	map['o'] = C_OPER;
+	map['O'] = C_CREATOR;
+}
+
 IRCChannel::IRCChannel(const std::string &channel_name) :
-	modes(0),
+	channelmodes(0),
 	name(channel_name),
 	topic(NULL),
-	key(NULL)
-{}
+	key(NULL),
+	mode_str("+")
+{
+	banned_users = std::set<std::string>();
+	muted_users = std::set<std::string>();
+	users = std::set<std::string>();
+	if (flags_enum.empty())
+		populateModeMap(flags_enum);
+}
 
 IRCChannel::IRCChannel(const std::string &channel_name, const std::string &channel_key) :
-	modes(0),
+	channelmodes(0),
 	name(channel_name),
 	topic(NULL),
-	key(channel_key)
+	key(channel_key),
+	mode_str("+")
 {
+	banned_users = std::set<std::string>();
+	muted_users = std::set<std::string>();
+	users = std::set<std::string>();
+	if (flags_enum.empty())
+		populateModeMap(flags_enum);
+	if(!channel_key.empty())
+		setModeFlag(C_KEY);
 }
+
 IRCChannel::IRCChannel(const IRCChannel &other) :
-	modes(other.modes),
+	channelmodes(other.channelmodes),
 	name(other.name),
 	key(other.key),
 	users(other.users),
 	muted_users(other.muted_users),
-	banned_users(other.banned_users)
+	banned_users(other.banned_users),
+	mode_str("+")
 {
-	if (other.topic != NULL)
+	if (other.topic)
 		topic = new std::string(*(other.topic));
 	else
 		topic = NULL;
@@ -71,7 +98,10 @@ void	IRCChannel::muteUser(const std::string nickname)
 
 bool	IRCChannel::isUserMuted(const std::string nickname) const throw()
 {
-	return (muted_users.find(nickname) != muted_users.end());
+	if(!muted_users.empty())
+		return (muted_users.find(nickname) != muted_users.end());
+	else
+		return(false);
 }
 
 void	IRCChannel::banUser(const std::string nickname)
@@ -81,7 +111,12 @@ void	IRCChannel::banUser(const std::string nickname)
 
 bool	IRCChannel::isUserBanned(const std::string nickname) const throw()
 {
-	return (banned_users.find(nickname) != banned_users.end());
+	if (banned_users.size() == 0)
+		return (false);
+	if(banned_users.size() > 0)
+		return (banned_users.find(nickname) != banned_users.end());
+	else
+		return(false);
 }
 
 const std::string	IRCChannel::getTopic() const throw()
@@ -100,15 +135,37 @@ void	IRCChannel::setTopic(const std::string &topic_str)
 
 int	IRCChannel::getModeFlags()
 {
-	return (modes);
+	return (channelmodes);
 }
 
 void	IRCChannel::setModeFlag(int flag)
 {
-	modes |= flag;
+	channelmodes |= flag;
 }
 
 void	IRCChannel::clearModeFlag(int flag)
 {
-	modes &= ~flag;
+	channelmodes &= ~flag;
+}
+
+IRCChannelModesMap &IRCChannel::getFlag_map()
+{
+	return (flags_enum);
+}
+
+const std::string	&IRCChannel::getModestr()
+{
+	mode_str.clear();
+	mode_str = "+";
+	for (IRCChannelModesMap::iterator it = flags_enum.begin(); it != flags_enum.end(); ++it)
+	{
+        if(channelmodes & it->second)
+			mode_str += it->first;
+    }
+	return (mode_str);
+}
+
+const std::string	&IRCChannel::getKey()
+{
+	return(key);
 }

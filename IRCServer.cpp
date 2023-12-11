@@ -245,3 +245,11 @@ std::string	IRCServer::getCurerntTimeAsStr()
 	strftime(buffer,sizeof(buffer),"%d-%m-%Y %H:%M:%S",timeinfo);
 	return (buffer);
 }
+
+bool	IRCServer::isChanneltaken(std::string &channelname)
+{
+	if(!channels.empty())
+		return(channels.find(channelname) != channels.end());
+	else
+		return(false);
+}
