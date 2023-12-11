@@ -68,4 +68,9 @@
 # define ERR_BADCHANNELKEY(server, target, channelname) IRC_RPL("475", server, target) + channelname + " :Cannot join channel (+k)\r\n"
 # define ERR_BANNEDFROMCHAN(server, target, channelname)IRC_RPL("474", server, target) + channelname + " :Cannot join channel (+b)\r\n"
 # define RPL_NAMREPLY(server, target, symbol, channel, list_of_nicks) (IRC_RPL("353", server, target) + " " + symbol + " " + channel + " :" + list_of_nicks + "\r\n")
+/*   handlePRIVMSG  */
+# define ERR_NOTEXTTOSEND(server, target) (IRC_RPL("412", server, target) + " :No text to send\r\n")
+# define ERR_NOSUCHNICK(server, target, param) (IRC_RPL("401", server, target) + " " + param + " :No such nick/channel\r\n")
+# define RPL_PRIVMSG(server, sender, target, message) (IRC_RPL("995", server, target) + ":" + sender + " PRIVMSG " + target + " " + message + "\r\n")
+
 #endif

@@ -222,7 +222,7 @@ void	IRCServer::create_channel(IRCUser &user, std::map<std::string, std::string>
 	std::string 									channel_key = it->second;
 	std::map<std::string, IRCChannel>::iterator		find;
 
-
+	/*	Makes sure channelname format and channelname is not Taken	*/
 	if(!(channel_name[0] == '+' || channel_name[0] == '!' || channel_name[0] == '#' || channel_name[0] == '&'))
 	{
 		*reply = ERR_NOSUCHCHANNEL(servername, user.getNickname(), channel_name);
@@ -233,26 +233,31 @@ void	IRCServer::create_channel(IRCUser &user, std::map<std::string, std::string>
 		*reply = ERR_NOSUCHCHANNEL(servername, user.getNickname(), channel_name);
 		return ;
 	}
+	/*	Makes a new IRCChannel object and adds it into our map	*/
 	IRCChannel newchannel(channel_name, channel_key);
 	channels.insert(std::make_pair(channel_name, newchannel));
 	find = channels.find(channel_name);
 	std::cout << GREEN << "Succesfully created Channel[" + find->first + "]" + DEF_COLOR << std::endl;
+	/*	Joins channel */
 	join_channel(user, channel_key, find->second, reply);
 }
 
 void	IRCServer::join_channel(IRCUser &user, std::string &user_key, IRCChannel &channel, std::string	*reply)
 {
+	/*	Checks if user is banned */
 	if(channel.isUserBanned(user.getNickname()))
 	{
 		*reply = ERR_BANNEDFROMCHAN(servername, user.getNickname(), channel.getName());
 		return;
 	}
+	/*	If channel needs a key to join , checks if key value is correct*/
 	if(channel.getModeFlags() & C_KEY && (channel.getKey() != (const std::string)user_key))
 	{
 		*reply = ERR_BADCHANNELKEY(servername, user.getNickname(), channel.getName());
 			return;
 	}
 	channel.addUser(user.getNickname());
+	/*	user succesfully joined , sending JOIN command to client.	*/
 	*reply = ":" + user.getNickname() + " JOIN " + channel.getName() + "\r\n";
 }
 
@@ -286,6 +291,37 @@ void	IRCServer::S_handleJOIN(IRCUser &user, const IRCMessage &msg)
 	// 	if (find_channel->second.getModeFlags() & C_KEY)
 	// 		std::cout << "Key :" << find_channel->second.getKey() << std::endl;
     // }
+}
 
-
+void	IRCServer::S_handlePRIVMSG(IRCUser &user, const IRCMessage &msg)
+{
+	std::string reply;
+	std::map<std::string, size_t>::iterator it;
+	
+	std::cout << "inside PRIVMSG" << std::endl;
+	if(msg.for_Channel() == true)
+		std::cout << "For Channel" << std::endl;
+	else
+	{
+		std::cout << RED <<  "For Users" << DEF_COLOR << std::endl;
+		if(msg.params.size() < 1)
+		{
+			reply = ERR_NOTEXTTOSEND(servername, user.getNickname());
+			user.queueSend(reply.c_str(), reply.size());
+			return;
+		}
+		std::cout << "target : " + msg.params[0] << std::endl;
+		it = users_map.find(msg.params[0]);
+		if(it != users_map.end())
+		{
+			std::cout << "sending msg" << std::endl;
+       		IRCUser		target = clients[it->second];
+			reply =  ":" + user.getNickname() + "!" + user.getUsername() + "@localhost PRIVMSG " + target.getNickname() +" " + msg.params[1] + "\r\n";
+			user.queueSend(reply.c_str(), reply.size());
+		}
+		else
+			reply = ERR_NOSUCHNICK(servername, user.getNickname(), msg.params[0]);
+		// if (!reply.empty())
+		// 	user.queueSend(reply.c_str(), reply.size());
+	}
 }

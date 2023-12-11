@@ -172,8 +172,8 @@ void	IRCServer::processCommands(IRCUser &user, const std::string &cmd)
 	IRCMessage	msg(cmd);
 	print_client_cmd(msg);
 	// Check authentication status
-	// if (!conn_pass.empty() && !user.isAuthenticated() && msg.command != "PASS")
-	// 	return ;
+	if (!conn_pass.empty() && !user.isAuthenticated() && msg.command != "PASS")
+		return ;
 	// Retrieve function pointer
 
 	if(msg.for_Channel() == true && msg.command != "JOIN")
@@ -220,6 +220,7 @@ void	IRCServer::populateServFuncMap()
 	serv_func_map["MODE"] = &IRCServer::S_handleMODE;
 	serv_func_map["QUIT"] = &IRCServer::S_handleQUIT;
 	serv_func_map["JOIN"] = &IRCServer::S_handleJOIN;
+	serv_func_map["PRIVMSG"] = &IRCServer::S_handlePRIVMSG;
 }
 
 void	IRCServer::populateChanFuncMap()
