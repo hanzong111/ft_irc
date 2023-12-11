@@ -66,5 +66,6 @@
 /*  handleJOIN  */
 # define ERR_NOSUCHCHANNEL(server, target, channelname) IRC_RPL("403", server, target) + channelname + " :No such channel\r\n"
 # define ERR_BADCHANNELKEY(server, target, channelname) IRC_RPL("475", server, target) + channelname + " :Cannot join channel (+k)\r\n"
-# define RPL_NAMREPLY(server, target, symbol, channel, list_of_nicks) (IRC_RPL("353", server, target) + " " + symbol + " #" + channel + " :" + list_of_nicks + "\r\n")
+# define ERR_BANNEDFROMCHAN(server, target, channelname)IRC_RPL("474", server, target) + channelname + " :Cannot join channel (+b)\r\n"
+# define RPL_NAMREPLY(server, target, symbol, channel, list_of_nicks) (IRC_RPL("353", server, target) + " " + symbol + " " + channel + " :" + list_of_nicks + "\r\n")
 #endif

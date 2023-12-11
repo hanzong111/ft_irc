@@ -69,9 +69,8 @@ class IRCServer : virtual public TCPServer<IRCUser>
 		void	S_handleQUIT(IRCUser &user, const IRCMessage &msg);
 		void	S_handleJOIN(IRCUser &user, const IRCMessage &msg);
 
-		void	create_channel(IRCUser &user, const IRCMessage &msg,
-						std::map<std::string, std::string>::iterator 	it, std::string *reply);
-		void	join_channel(IRCUser &user, const IRCMessage &msg, IRCChannel &channel);
+		void	create_channel(IRCUser &user, std::map<std::string, std::string>::iterator 	it, std::string *reply);
+		void	join_channel(IRCUser &user, std::string &user_key, IRCChannel &channel, std::string *reply);
 		bool	isChanneltaken(std::string &channelname);
 		/*	Channel Commands	*/
 		void	C_handleWHO(IRCUser &user, const IRCMessage &msg);

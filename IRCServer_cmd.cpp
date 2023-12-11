@@ -216,7 +216,7 @@ void	make_channelandkeys(std::map<std::string , std::string> *channels_and_keys,
 	}
 }
 
-void	IRCServer::create_channel(IRCUser &user, const IRCMessage &msg, std::map<std::string, std::string>::iterator 	it, std::string *reply)
+void	IRCServer::create_channel(IRCUser &user, std::map<std::string, std::string>::iterator 	it, std::string *reply)
 {
 	std::string 									channel_name = it->first;
 	std::string 									channel_key = it->second;
@@ -237,20 +237,23 @@ void	IRCServer::create_channel(IRCUser &user, const IRCMessage &msg, std::map<st
 	channels.insert(std::make_pair(channel_name, newchannel));
 	find = channels.find(channel_name);
 	std::cout << GREEN << "Succesfully created Channel[" + find->first + "]" + DEF_COLOR << std::endl;
-	join_channel(user, msg, find->second);
+	join_channel(user, channel_key, find->second, reply);
 }
 
-void	IRCServer::join_channel(IRCUser &user, const IRCMessage &msg, IRCChannel &channel)
+void	IRCServer::join_channel(IRCUser &user, std::string &user_key, IRCChannel &channel, std::string	*reply)
 {
-	(void)msg;
-	std::string	reply;
 	if(channel.isUserBanned(user.getNickname()))
 	{
-		reply = ERR_BADCHANNELKEY(servername, user.getNickname(), channel.getName());
-		user.queueSend(reply.c_str(), reply.size());
+		*reply = ERR_BANNEDFROMCHAN(servername, user.getNickname(), channel.getName());
 		return;
 	}
-		std::cout << GREEN << "Checking Keys  " << DEF_COLOR << std::endl;
+	if(channel.getModeFlags() & C_KEY && (channel.getKey() != (const std::string)user_key))
+	{
+		*reply = ERR_BADCHANNELKEY(servername, user.getNickname(), channel.getName());
+			return;
+	}
+	channel.addUser(user.getNickname());
+	*reply = ":" + user.getNickname() + " JOIN " + channel.getName() + "\r\n";
 }
 
 void	IRCServer::S_handleJOIN(IRCUser &user, const IRCMessage &msg)
@@ -268,12 +271,12 @@ void	IRCServer::S_handleJOIN(IRCUser &user, const IRCMessage &msg)
         if(find_channel == channels.end())
 		{
 			if(user.getModeFlags() & OPER)
-				create_channel(user, msg, it, &reply);
+				create_channel(user, it, &reply);
 			else
 				reply = ERR_NOSUCHCHANNEL(servername, user.getNickname(), it->first);
 		}
 		else
-			join_channel(user, msg, find_channel->second);
+			join_channel(user, it->second, find_channel->second, &reply);
 		if (!reply.empty())
 			user.queueSend(reply.c_str(), reply.size());
     }

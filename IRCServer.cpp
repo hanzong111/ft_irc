@@ -172,8 +172,8 @@ void	IRCServer::processCommands(IRCUser &user, const std::string &cmd)
 	IRCMessage	msg(cmd);
 	print_client_cmd(msg);
 	// Check authentication status
-	if (!conn_pass.empty() && !user.isAuthenticated() && msg.command != "PASS")
-		return ;
+	// if (!conn_pass.empty() && !user.isAuthenticated() && msg.command != "PASS")
+	// 	return ;
 	// Retrieve function pointer
 
 	if(msg.for_Channel() == true && msg.command != "JOIN")
@@ -225,13 +225,6 @@ void	IRCServer::populateServFuncMap()
 void	IRCServer::populateChanFuncMap()
 {
 	chan_func_map["WHO"] = &IRCServer::C_handleWHO;
-}
-
-void	IRCServer::C_handleWHO(IRCUser &user, const IRCMessage &msg)
-{
-	(void)msg;
-	std::string reply = RPL_NAMREPLY(servername, user.getNickname(), "=", "Try", "Hanz Henr Zoe");
-	user.queueSend(reply.c_str(), reply.size());
 }
 
 std::string	IRCServer::getCurerntTimeAsStr()
