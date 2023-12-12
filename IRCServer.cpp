@@ -112,6 +112,11 @@ void	IRCServer::startServer()
 	}
 }
 
+void	IRCServer::createChannel(const std::string &channel_name)
+{
+	channels.insert(std::pair<std::string, IRCChannel>(channel_name, IRCChannel(channel_name)));
+}
+
 size_t	IRCServer::handlePollIn(size_t ind)
 {
 	ssize_t	n_bytes_recv;
