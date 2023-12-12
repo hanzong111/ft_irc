@@ -16,7 +16,7 @@ IRCChannel::IRCChannel(const std::string &channel_name) :
 	channelmodes(0),
 	name(channel_name),
 	topic(NULL),
-	key(NULL),
+	key(""),
 	mode_str("+")
 {
 	banned_users = std::set<std::string>();
