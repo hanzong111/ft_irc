@@ -300,7 +300,35 @@ void	IRCServer::S_handlePRIVMSG(IRCUser &user, const IRCMessage &msg)
 	
 	std::cout << "inside PRIVMSG" << std::endl;
 	if(msg.for_Channel() == true)
+	{
+		IRCChannel *target_channel = NULL;
+
 		std::cout << "For Channel" << std::endl;
+		try
+		{
+			target_channel = &channels.at(msg.params[0]);
+		}
+		catch (const std::out_of_range &e)
+		{
+			// Channel doesn't exist, hence sender cannot be in the channel, deny. 
+			reply = ERR_CANNOTSENDTOCHAN(servername, user.getNickname(), msg.params[0]);
+			user.queueSend(reply.c_str(), reply.size());
+			return ;
+		}
+		reply =  ":" + user.getNickname() + "!" + user.getUsername() + "@" + user.getIPAddrStr();
+		reply += " PRIVMSG " + msg.params[0] + " " + msg.params[1] + "\r\n";
+		IRCChannel::UsersList targets = target_channel->getUsers();
+		if (targets.find(user.getNickname()) == targets.end())
+		{
+			// Sender is not in channel, deny.
+			reply = ERR_CANNOTSENDTOCHAN(servername, user.getNickname(), msg.params[0]);
+			user.queueSend(reply.c_str(), reply.size());
+			return ;
+		}
+		else
+			targets.erase(user.getNickname());
+		broadcastToUsers(targets, reply);
+	}
 	else
 	{
 		std::cout << RED <<  "For Users" << DEF_COLOR << std::endl;
