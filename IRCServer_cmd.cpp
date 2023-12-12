@@ -279,7 +279,22 @@ void	IRCServer::join_channel(IRCUser &user, std::string &user_key, IRCChannel &c
 
 void	IRCServer::dc_from_channels(IRCUser &user)
 {
-	std::cout << user.getNickname() + "disconnecting from all channels" << std::endl;
+	std::map<std::string, IRCChannel>::iterator	it;
+	std::string									part_msg = user.getNickname();
+	std::string									PART;
+
+	for(it = channels.begin(); it != channels.end(); ++it)
+	{
+		if(it->second.isUserInChannel(user.getNickname()))
+		{
+			it->second.removeUser(user.getNickname());
+			if(it->second.isUserOper(user.getNickname()))
+				it->second.removeOper(user.getNickname());
+			PART = ":" + user.getNickname() + " PART " + it->second.getName() + " " + part_msg + "\r\n";
+			user.queueSend(PART.c_str(), PART.size());
+			broadcastToChannel(it->second.getName(), PART);
+		}
+	}
 }
 
 void	IRCServer::S_handleJOIN(IRCUser &user, const IRCMessage &msg)
@@ -290,9 +305,9 @@ void	IRCServer::S_handleJOIN(IRCUser &user, const IRCMessage &msg)
 	std::map<std::string, std::string>::iterator 	it;
 	std::map<std::string, IRCChannel>::iterator 	find_channel;
 
+	make_channelandkeys(&channels_and_keys, msg);
 	if(msg.params[0] == "0")
 		return(dc_from_channels(user));
-	make_channelandkeys(&channels_and_keys, msg);
 	for (it = channels_and_keys.begin(); it != channels_and_keys.end(); ++it) 
 	{
 		find_channel = channels.find(it->first);
