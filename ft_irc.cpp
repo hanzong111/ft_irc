@@ -20,6 +20,7 @@ int	main(int argc, char **argv)
 		
 		IRCServer server("127.0.0.1", port_num);
 		server.setConnPass(std::string(argv[2]));
+		server.createChannel("#Test");
 		std::cout << "Starting server" << std::endl;
 		server.startServer();
 		
