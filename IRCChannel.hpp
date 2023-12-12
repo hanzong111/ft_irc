@@ -33,9 +33,9 @@ class IRCUser;
 
 class IRCChannel
 {
-	typedef std::set<std::string> UsersList;
-
 	public:
+		typedef std::set<std::string> UsersList;
+		
 		IRCChannel(const std::string &channel_name);
 		IRCChannel(const std::string &channel_name, const std::string &channel_key);
 		IRCChannel(const IRCChannel &other);
