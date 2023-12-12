@@ -61,6 +61,8 @@ class IRCServer : virtual public TCPServer<IRCUser>
 		void	sendWelcomeMessages(IRCUser &user);
 		void	broadcastToUsers(const UsersList &target_nicknames,
 								const std::string &message);
+		int		broadcastToChannel(const std::string &channel_name,
+								const std::string &message);
 
 		void	Server_commands(IRCUser &user,const IRCMessage &cmd);
 		void	Channel_commands(IRCUser &user, const IRCMessage &msg);

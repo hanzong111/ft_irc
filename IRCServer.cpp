@@ -238,6 +238,23 @@ void	IRCServer::broadcastToUsers(const UsersList &target_nicknames,
 	}
 }
 
+int	IRCServer::broadcastToChannel(const std::string &channel_name, const std::string &message)
+{
+	IRCChannel	*target_channel = NULL;
+
+	try
+	{
+		target_channel = &channels.at(channel_name);
+	}
+	catch (const std::out_of_range &e)
+	{
+		std::cerr << "Warning: Channel not found (" << channel_name << ")" << std::endl;
+		return (-1);
+	}
+	broadcastToUsers(target_channel->getUsers(), message);
+	return (0);
+}
+
 void	IRCServer::populateServFuncMap()
 {
 	serv_func_map["PASS"] = &IRCServer::S_handlePASS;
