@@ -21,9 +21,6 @@ typedef enum IRCChannelModes
 {
 	C_KEY = 0x80,
 	C_LIMIT = 0x100,
-	C_OPER = 0x200,
-	C_CREATOR = 0x400,
-	C_MODE = 0x800
 } e_IRCChannelModes;
 
 typedef std::map<const char, enum IRCChannelModes> IRCChannelModesMap;
@@ -58,7 +55,9 @@ class IRCChannel
 		int					getModeFlags();
 		void				setModeFlag(int flag);
 		void				clearModeFlag(int flag);
-		void				Channel_commands(IRCUser &user, const IRCMessage &msg);
+		void				setCreator(const std::string &user);
+		void				addOper(const std::string nickname);
+		void				removeOper(const std::string nickname);
 		
 	private:
 		// Class contains const member, should not be assignable. 
@@ -71,8 +70,10 @@ class IRCChannel
 		UsersList 									users;
 		UsersList 									muted_users;
 		UsersList 									banned_users;
+		UsersList									channel_opers;
 		static IRCChannelModesMap					flags_enum;
 		std::string									mode_str;
+		std::string									creator;
 
 	//friend class IRCServer;
 };

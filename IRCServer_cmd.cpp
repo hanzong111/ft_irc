@@ -237,13 +237,15 @@ void	IRCServer::create_channel(IRCUser &user, std::map<std::string, std::string>
 	IRCChannel newchannel(channel_name, channel_key);
 	channels.insert(std::make_pair(channel_name, newchannel));
 	find = channels.find(channel_name);
-	std::cout << GREEN << "Succesfully created Channel[" + find->first + "]" + DEF_COLOR << std::endl;
+	find->second.setCreator(user.getNickname());
+	find->second.addOper(user.getNickname());
 	/*	Joins channel */
 	join_channel(user, channel_key, find->second, reply);
 }
 
 void	IRCServer::join_channel(IRCUser &user, std::string &user_key, IRCChannel &channel, std::string	*reply)
 {
+	std::string	JOIN;
 	/*	Checks if user is banned */
 	if(channel.isUserBanned(user.getNickname()))
 	{
@@ -258,7 +260,26 @@ void	IRCServer::join_channel(IRCUser &user, std::string &user_key, IRCChannel &c
 	}
 	channel.addUser(user.getNickname());
 	/*	user succesfully joined , sending JOIN command to client.	*/
-	*reply = ":" + user.getNickname() + " JOIN " + channel.getName() + "\r\n";
+	JOIN = ":" + user.getNickname() + " JOIN " + channel.getName() + "\r\n";
+	broadcastToChannel(channel.getName(), JOIN);
+	*reply = RPL_TOPIC(servername, user.getNickname(), channel.getName(), channel.getTopic());
+	user.queueSend(reply->c_str(), reply->size());
+	std::set<std::string>						user_list;
+	std::set<std::string>::iterator				it;
+	std::string									user_str;
+
+	user_list = channel.getUsers();
+	for(it = user_list.begin();it != user_list.end(); ++it)
+	{
+		user_str += *it;
+		user_str += " ";
+	}
+	*reply = RPL_NAMREPLY(servername, user.getNickname(),"=", channel.getName(), user_str);
+}
+
+void	IRCServer::dc_from_channels(IRCUser &user)
+{
+	std::cout << user.getNickname() + "disconnecting from all channels" << std::endl;
 }
 
 void	IRCServer::S_handleJOIN(IRCUser &user, const IRCMessage &msg)
@@ -269,6 +290,8 @@ void	IRCServer::S_handleJOIN(IRCUser &user, const IRCMessage &msg)
 	std::map<std::string, std::string>::iterator 	it;
 	std::map<std::string, IRCChannel>::iterator 	find_channel;
 
+	if(msg.params[0] == "0")
+		return(dc_from_channels(user));
 	make_channelandkeys(&channels_and_keys, msg);
 	for (it = channels_and_keys.begin(); it != channels_and_keys.end(); ++it) 
 	{
@@ -285,12 +308,6 @@ void	IRCServer::S_handleJOIN(IRCUser &user, const IRCMessage &msg)
 		if (!reply.empty())
 			user.queueSend(reply.c_str(), reply.size());
     }
-	// for (find_channel = channels.begin(); find_channel != channels.end(); ++find_channel) 
-	// {
-	// 	std::cout << "Channel_Name:" + find_channel->second.getName() <<  std::endl;
-	// 	if (find_channel->second.getModeFlags() & C_KEY)
-	// 		std::cout << "Key :" << find_channel->second.getKey() << std::endl;
-    // }
 }
 
 void	IRCServer::S_handlePRIVMSG(IRCUser &user, const IRCMessage &msg)
@@ -299,7 +316,7 @@ void	IRCServer::S_handlePRIVMSG(IRCUser &user, const IRCMessage &msg)
 	std::map<std::string, size_t>::iterator it;
 	
 	std::cout << "inside PRIVMSG" << std::endl;
-	if(msg.for_Channel() == true)
+	if(msg.for_Channel())
 	{
 		IRCChannel *target_channel = NULL;
 

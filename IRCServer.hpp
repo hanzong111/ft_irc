@@ -3,6 +3,7 @@
 
 # include "TCPServer.hpp"
 # include "IRCChannel.hpp"
+# include "IRCMessage.hpp"
 # include <poll.h>
 # include <netinet/in.h>
 # include <string>
@@ -63,9 +64,10 @@ class IRCServer : virtual public TCPServer<IRCUser>
 								const std::string &message);
 		int		broadcastToChannel(const std::string &channel_name,
 								const std::string &message);
+		// void	broadcastWHOtousers(const UsersList &target_nicknames,
+		// 						const std::string &message);
 
 		void	Server_commands(IRCUser &user,const IRCMessage &cmd);
-		void	Channel_commands(IRCUser &user, const IRCMessage &msg);
 
 		/*	Server Commands		*/
 		void	S_handlePASS(IRCUser &user, const IRCMessage &msg);
@@ -77,15 +79,15 @@ class IRCServer : virtual public TCPServer<IRCUser>
 		void	S_handleJOIN(IRCUser &user, const IRCMessage &msg);
 		void	S_handlePRIVMSG(IRCUser &user, const IRCMessage &msg);
 
-		void	create_channel(IRCUser &user, std::map<std::string, std::string>::iterator 	it, std::string *reply);
-		void	join_channel(IRCUser &user, std::string &user_key, IRCChannel &channel, std::string *reply);
-		bool	isChanneltaken(std::string &channelname);
 		/*	Channel Commands	*/
 		void	C_handleWHO(IRCUser &user, const IRCMessage &msg);
+		void	create_channel(IRCUser &user, std::map<std::string, std::string>::iterator 	it, std::string *reply);
+		void	join_channel(IRCUser &user, std::string &user_key, IRCChannel &channel, std::string *reply);
+		void	dc_from_channels(IRCUser &user);
+		bool	isChanneltaken(std::string &channelname);
 
 
 		std::map<std::string, MemFuncPtr>			serv_func_map;
-		std::map<std::string, MemFuncPtr>			chan_func_map;
 		// `users_map` maps username to index in `clients`
 		std::map<std::string, size_t>				users_map;
 		std::map<std::string, IRCChannel>			channels;

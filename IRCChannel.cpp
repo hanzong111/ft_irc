@@ -8,8 +8,6 @@ void	populateModeMap(IRCChannelModesMap &map)
 {
 	map['c'] = C_KEY;
 	map['l'] = C_LIMIT;
-	map['o'] = C_OPER;
-	map['O'] = C_CREATOR;
 }
 
 IRCChannel::IRCChannel(const std::string &channel_name) :
@@ -17,11 +15,13 @@ IRCChannel::IRCChannel(const std::string &channel_name) :
 	name(channel_name),
 	topic(NULL),
 	key(""),
-	mode_str("+")
+	mode_str("+"),
+	creator("")
 {
 	banned_users = std::set<std::string>();
 	muted_users = std::set<std::string>();
 	users = std::set<std::string>();
+	channel_opers = std::set<std::string>();
 	if (flags_enum.empty())
 		populateModeMap(flags_enum);
 }
@@ -31,11 +31,13 @@ IRCChannel::IRCChannel(const std::string &channel_name, const std::string &chann
 	name(channel_name),
 	topic(NULL),
 	key(channel_key),
-	mode_str("+")
+	mode_str("+"),
+	creator("")
 {
 	banned_users = std::set<std::string>();
 	muted_users = std::set<std::string>();
 	users = std::set<std::string>();
+	channel_opers = std::set<std::string>();
 	if (flags_enum.empty())
 		populateModeMap(flags_enum);
 	if(!channel_key.empty())
@@ -49,7 +51,9 @@ IRCChannel::IRCChannel(const IRCChannel &other) :
 	users(other.users),
 	muted_users(other.muted_users),
 	banned_users(other.banned_users),
-	mode_str("+")
+	channel_opers(other.channel_opers),
+	mode_str("+"),
+	creator(other.creator)
 {
 	if (other.topic)
 		topic = new std::string(*(other.topic));
@@ -168,4 +172,20 @@ const std::string	&IRCChannel::getModestr()
 const std::string	&IRCChannel::getKey()
 {
 	return(key);
+}
+
+void	IRCChannel::setCreator(const std::string &user)
+{
+	creator = user;
+}
+
+void	IRCChannel::addOper(const std::string nickname)
+{
+	if (banned_users.find(nickname) == banned_users.end())
+		channel_opers.insert(nickname);
+}
+
+void	IRCChannel::removeOper(const std::string nickname)
+{
+	channel_opers.erase(nickname);
 }

@@ -10,7 +10,8 @@ IRCMessage::IRCMessage() :
 {}
 
 IRCMessage::IRCMessage(const std::string &msg) :
-	is_valid(true)
+	is_valid(true),
+	for_channel(false)
 {
 	size_t	ind = 0;
 	size_t	len = 0;
@@ -54,8 +55,6 @@ IRCMessage::IRCMessage(const std::string &msg) :
 		std::cout << params[0][0] << std::endl;
 		if (params[0][0] == '#' || params[0][0] == '&' || params[0][0] == '+' || params[0][0] == '!')
 			for_channel = true;
-		if(for_channel == true)
-			std::cout << "Its true" << std::endl;
 	}
 }
 

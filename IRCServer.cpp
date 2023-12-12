@@ -25,8 +25,6 @@ IRCServer::IRCServer(const std::string &ip_addr, uint16_t port_num) :
 {
 	if (serv_func_map.empty())
 		populateServFuncMap();
-	if (chan_func_map.empty())
-		populateChanFuncMap();
 }
 
 IRCServer::IRCServer(const IRCServer &other) :
@@ -35,8 +33,6 @@ IRCServer::IRCServer(const IRCServer &other) :
 {
 	if (serv_func_map.empty())
 		populateServFuncMap();
-	if (chan_func_map.empty())
-		populateChanFuncMap();
 	*this = other;
 }
 
@@ -47,8 +43,6 @@ IRCServer &IRCServer::operator=(const IRCServer &other)
 	TCPServer::operator=(other);
 	if (serv_func_map.empty())
 		populateServFuncMap();
-	if (chan_func_map.empty())
-		populateChanFuncMap();
 	conn_pass = other.conn_pass;
 	servername = other.servername;
 	channels = other.channels;
@@ -183,11 +177,7 @@ void	IRCServer::processCommands(IRCUser &user, const std::string &cmd)
 	if (!conn_pass.empty() && !user.isAuthenticated() && msg.command != "PASS")
 		return ;
 	// Retrieve function pointer
-
-	if(msg.for_Channel() == true && msg.command != "JOIN")
-		Channel_commands(user, msg);
-	else
-		Server_commands(user, msg);
+	Server_commands(user, msg);
 }
 
 void	IRCServer::Server_commands(IRCUser &user,const IRCMessage &msg)
@@ -265,11 +255,7 @@ void	IRCServer::populateServFuncMap()
 	serv_func_map["QUIT"] = &IRCServer::S_handleQUIT;
 	serv_func_map["JOIN"] = &IRCServer::S_handleJOIN;
 	serv_func_map["PRIVMSG"] = &IRCServer::S_handlePRIVMSG;
-}
-
-void	IRCServer::populateChanFuncMap()
-{
-	chan_func_map["WHO"] = &IRCServer::C_handleWHO;
+	serv_func_map["WHO"] = &IRCServer::C_handleWHO;
 }
 
 std::string	IRCServer::getCurrentTimeAsStr()

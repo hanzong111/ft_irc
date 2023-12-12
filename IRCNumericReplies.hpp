@@ -46,7 +46,7 @@
 # define RPL_CREATED(server, target, date) IRC_RPL("003", server, target) + " :This server was created " + date + "\r\n"
 # define RPL_MYINFO(server, target, version, usermodes, channelmodes) IRC_RPL("004", server, target) + " " + server + " " + version + " " + usermodes + " " + channelmodes + "\r\n"
 # define RPL_NOTOPIC(server, target, channel_name) IRC_RPL("331", server, target) + " " + channel_name + " :No topic is set\r\n"
-# define RPL_TOPIC(server, target, channel_name, topic_str) IRC_RPL("332", server, target) + " " + channel_name + " :" + topic_str \"\r\n"
+# define RPL_TOPIC(server, target, channel_name, topic_str) IRC_RPL("332", server, target) + " " + channel_name + " :" + topic_str + "\r\n"
 /*  handleNICK  */
 # define ERR_NONICKNAMEGIVEN(server, target) IRC_RPL("431", server, target) + " :No nickname given\r\n"
 # define ERR_ERRONEUSNICKNAME(server, target, requested_nickname) IRC_RPL("432", server, target) + " " + requested_nickname + " :Erroneous nickname\r\n"
@@ -73,6 +73,8 @@
 # define ERR_NORECIPIENT(server, target, command) (IRC_RPL("411", server, target) + " :No recipient given (" + command + ")\r\n")
 # define ERR_NOTEXTTOSEND(server, target) (IRC_RPL("412", server, target) + " :No text to send\r\n")
 # define ERR_NOSUCHNICK(server, target, param) (IRC_RPL("401", server, target) + " " + param + " :No such nick/channel\r\n")
-# define RPL_PRIVMSG(server, sender, target, message) (IRC_RPL("995", server, target) + ":" + sender + " PRIVMSG " + target + " " + message + "\r\n")
+
+/*   handlePART     */
+# define ERR_NOTONCHANNEL(server, target, channel) (IRC_RPL("442", server, target) + " " + channel + " :You're not on that channel\r\n")
 
 #endif
