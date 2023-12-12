@@ -304,7 +304,13 @@ void	IRCServer::S_handlePRIVMSG(IRCUser &user, const IRCMessage &msg)
 	else
 	{
 		std::cout << RED <<  "For Users" << DEF_COLOR << std::endl;
-		if(msg.params.size() < 2)
+		if(msg.params.size() < 1)
+		{
+			reply = ERR_NORECIPIENT(servername, user.getNickname(), "PRIVMSG");
+			user.queueSend(reply.c_str(), reply.size());
+			return;
+		}
+		else if(msg.params.size() < 2)
 		{
 			reply = ERR_NOTEXTTOSEND(servername, user.getNickname());
 			user.queueSend(reply.c_str(), reply.size());
@@ -316,7 +322,8 @@ void	IRCServer::S_handlePRIVMSG(IRCUser &user, const IRCMessage &msg)
 		{
 			std::cout << "sending msg" << std::endl;
        		IRCUser		&target = clients[it->second];
-			reply =  ":" + user.getNickname() + "!" + user.getUsername() + "@localhost PRIVMSG " + target.getNickname() +" " + msg.params[1] + "\r\n";
+			reply =  ":" + user.getNickname() + "!" + user.getUsername() + "@" + user.getIPAddrStr();
+			reply += " PRIVMSG " + target.getNickname() + " " + msg.params[1] + "\r\n";
 			target.queueSend(reply.c_str(), reply.size());
 		}
 		else
