@@ -64,9 +64,9 @@
 # define RPL_UMODEIS(server, target, mode) IRC_RPL("221", server, target) + " " + mode + "\r\n"
 # define ERR_UMODEUNKNOWNFLAG(server, target) IRC_RPL("501", server, target) + " :Unknown MODE flag\r\n"
 /*  handleJOIN  */
-# define ERR_NOSUCHCHANNEL(server, target, channelname) IRC_RPL("403", server, target) + channelname + " :No such channel\r\n"
-# define ERR_BADCHANNELKEY(server, target, channelname) IRC_RPL("475", server, target) + channelname + " :Cannot join channel (+k)\r\n"
-# define ERR_BANNEDFROMCHAN(server, target, channelname)IRC_RPL("474", server, target) + channelname + " :Cannot join channel (+b)\r\n"
+# define ERR_NOSUCHCHANNEL(server, target, channelname) IRC_RPL("403", server, target) + " " + channelname + " :No such channel\r\n"
+# define ERR_BADCHANNELKEY(server, target, channelname) IRC_RPL("475", server, target) + " " + channelname + " :Cannot join channel (+k)\r\n"
+# define ERR_BANNEDFROMCHAN(server, target, channelname)IRC_RPL("474", server, target) + " " + channelname + " :Cannot join channel (+b)\r\n"
 # define RPL_NAMREPLY(server, target, symbol, channel, list_of_nicks) (IRC_RPL("353", server, target) + " " + symbol + " " + channel + " :" + list_of_nicks + "\r\n")
 /*   handlePRIVMSG  */
 # define ERR_CANNOTSENDTOCHAN(server, target, channel) (IRC_RPL("404", server, target) + " " + channel + " :Cannot send to channel\r\n")
@@ -76,5 +76,6 @@
 
 /*   handlePART     */
 # define ERR_NOTONCHANNEL(server, target, channel) (IRC_RPL("442", server, target) + " " + channel + " :You're not on that channel\r\n")
+# define ERR_CHANOPRIVSNEEDED(server, target, channel) (IRC_RPL("482", server, target) + " " + channel + " :You're not channel operator\r\n")
 
 #endif

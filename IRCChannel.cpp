@@ -137,6 +137,14 @@ void	IRCChannel::setTopic(const std::string &topic_str)
 	topic = new std::string(topic_str);
 }
 
+bool	IRCChannel::isTopicset() const throw()
+{
+	if(topic == NULL)
+		return(false);
+	else
+		return(true);
+}
+
 int	IRCChannel::getModeFlags()
 {
 	return (channelmodes);

@@ -64,7 +64,6 @@ void	IRCServer::C_handlePART(IRCUser &user, const IRCMessage &msg)
 					PART = ":" + user.getNickname() + " PART " + channel_it->second.getName() + " " + part_msg + "\r\n";
 					user.queueSend(PART.c_str(), PART.size());
 					broadcastToChannel(channel_it->second.getName(), PART);
-					std::cout << GREEN << "disconnecting user" << DEF_COLOR <<std::endl;
 				}
 			}
 		}

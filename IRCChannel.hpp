@@ -52,6 +52,7 @@ class IRCChannel
 		bool				isUserBanned(const std::string nickname) const throw();
 		const std::string	getTopic() const throw();
 		void				setTopic(const std::string &topic_str);
+		bool				isTopicset() const throw();
 		int					getModeFlags();
 		void				setModeFlag(int flag);
 		void				clearModeFlag(int flag);
