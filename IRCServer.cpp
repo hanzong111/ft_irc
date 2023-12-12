@@ -21,7 +21,7 @@ IRCServer::IRCServer(const std::string &ip_addr, uint16_t port_num) :
 	TCPHost(),
 	TCPServer(ip_addr, port_num),
 	servername(ip_addr),
-	time_created(IRCServer::getCurerntTimeAsStr())
+	time_created(IRCServer::getCurrentTimeAsStr())
 {
 	if (serv_func_map.empty())
 		populateServFuncMap();
@@ -231,7 +231,7 @@ void	IRCServer::populateChanFuncMap()
 	chan_func_map["WHO"] = &IRCServer::C_handleWHO;
 }
 
-std::string	IRCServer::getCurerntTimeAsStr()
+std::string	IRCServer::getCurrentTimeAsStr()
 {
 	time_t rawtime;
 	struct tm * timeinfo;

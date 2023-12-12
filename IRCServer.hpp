@@ -46,7 +46,7 @@ class IRCServer : virtual public TCPServer<IRCUser>
 		void			startServer();
 	
 	private:
-		static std::string getCurerntTimeAsStr();
+		static std::string getCurrentTimeAsStr();
 
 		size_t	handlePollIn(size_t ind);
 		size_t	handlePollOut(size_t ind);
