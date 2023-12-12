@@ -304,7 +304,7 @@ void	IRCServer::S_handlePRIVMSG(IRCUser &user, const IRCMessage &msg)
 	else
 	{
 		std::cout << RED <<  "For Users" << DEF_COLOR << std::endl;
-		if(msg.params.size() < 1)
+		if(msg.params.size() < 2)
 		{
 			reply = ERR_NOTEXTTOSEND(servername, user.getNickname());
 			user.queueSend(reply.c_str(), reply.size());
