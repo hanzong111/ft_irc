@@ -76,7 +76,10 @@ void	IRCServer::handleEvents()
 		std::cout << "Connection request received" << std::endl;
 		count++;
 		if (pollfd_struct->revents & POLLIN)
+		{
 			acceptConnReq();
+			updateUsersMap();
+		}
 	}
 	for (size_t i = 0; i < clients.size(); i++)
 	{
