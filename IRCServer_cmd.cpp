@@ -317,7 +317,7 @@ void	IRCServer::S_handlePRIVMSG(IRCUser &user, const IRCMessage &msg)
 			std::cout << "sending msg" << std::endl;
        		IRCUser		target = clients[it->second];
 			reply =  ":" + user.getNickname() + "!" + user.getUsername() + "@localhost PRIVMSG " + target.getNickname() +" " + msg.params[1] + "\r\n";
-			user.queueSend(reply.c_str(), reply.size());
+			target.queueSend(reply.c_str(), reply.size());
 		}
 		else
 			reply = ERR_NOSUCHNICK(servername, user.getNickname(), msg.params[0]);
