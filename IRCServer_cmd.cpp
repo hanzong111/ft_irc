@@ -315,7 +315,7 @@ void	IRCServer::S_handlePRIVMSG(IRCUser &user, const IRCMessage &msg)
 		if(it != users_map.end())
 		{
 			std::cout << "sending msg" << std::endl;
-       		IRCUser		target = clients[it->second];
+       		IRCUser		&target = clients[it->second];
 			reply =  ":" + user.getNickname() + "!" + user.getUsername() + "@localhost PRIVMSG " + target.getNickname() +" " + msg.params[1] + "\r\n";
 			target.queueSend(reply.c_str(), reply.size());
 		}
