@@ -13,7 +13,7 @@ void	IRCServer::Channel_commands(IRCUser &user, const IRCMessage &msg)
 
 	try
 	{
-		f = chan_func_map.at(msg.command);
+		f = serv_func_map.at(msg.command);
 	}
 	catch (std::out_of_range &e)
 	{
