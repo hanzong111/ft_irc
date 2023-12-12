@@ -189,3 +189,8 @@ void	IRCChannel::removeOper(const std::string nickname)
 {
 	channel_opers.erase(nickname);
 }
+
+bool	IRCChannel::isUserOper(const std::string nickname) const throw()
+{
+	return (channel_opers.find(nickname) != channel_opers.end());
+}

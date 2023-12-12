@@ -58,6 +58,7 @@ class IRCChannel
 		void				setCreator(const std::string &user);
 		void				addOper(const std::string nickname);
 		void				removeOper(const std::string nickname);
+		bool				isUserOper(const std::string nickname) const throw();
 		
 	private:
 		// Class contains const member, should not be assignable. 

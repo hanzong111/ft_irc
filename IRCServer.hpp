@@ -32,6 +32,8 @@
 class IRCMessage;
 class IRCUser;
 
+std::vector<std::string> split(const std::string& str, char delimiter);
+
 class IRCServer : virtual public TCPServer<IRCUser>
 {
 	typedef std::set<std::string> UsersList;
@@ -81,6 +83,7 @@ class IRCServer : virtual public TCPServer<IRCUser>
 
 		/*	Channel Commands	*/
 		void	C_handleWHO(IRCUser &user, const IRCMessage &msg);
+		void	C_handlePART(IRCUser &user, const IRCMessage &msg);
 		void	create_channel(IRCUser &user, std::map<std::string, std::string>::iterator 	it, std::string *reply);
 		void	join_channel(IRCUser &user, std::string &user_key, IRCChannel &channel, std::string *reply);
 		void	dc_from_channels(IRCUser &user);
