@@ -33,6 +33,8 @@ class IRCUser;
 
 class IRCServer : virtual public TCPServer<IRCUser>
 {
+	typedef std::set<std::string> UsersList;
+
 	public:
 		typedef void (IRCServer::*MemFuncPtr)(IRCUser &, const IRCMessage &);
 
@@ -57,6 +59,8 @@ class IRCServer : virtual public TCPServer<IRCUser>
 		bool	addUser();
 		void	updateUsersMap();
 		void	sendWelcomeMessages(IRCUser &user);
+		void	broadcastToUsers(const UsersList &target_nicknames,
+								const std::string &message);
 
 		void	Server_commands(IRCUser &user,const IRCMessage &cmd);
 		void	Channel_commands(IRCUser &user, const IRCMessage &msg);

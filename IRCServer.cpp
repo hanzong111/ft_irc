@@ -219,6 +219,25 @@ void	IRCServer::updateUsersMap()
 		users_map[it->getNickname()] = ind++;
 }
 
+void	IRCServer::broadcastToUsers(const UsersList &target_nicknames,
+			const std::string &message)
+{
+	size_t	target_ind;
+	
+	for (UsersList::const_iterator it = target_nicknames.begin(); it != target_nicknames.end(); it++)
+	{
+		try
+		{
+			target_ind = users_map.at(*it);
+			clients[target_ind].queueSend(message.c_str(), message.size());
+		}
+		catch (const std::out_of_range &e)
+		{
+			std::cerr << "Warning: Nickname not found (" << *it << ")" << std::endl;
+		}
+	}
+}
+
 void	IRCServer::populateServFuncMap()
 {
 	serv_func_map["PASS"] = &IRCServer::S_handlePASS;
