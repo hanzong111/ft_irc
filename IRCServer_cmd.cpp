@@ -327,8 +327,9 @@ void	IRCServer::S_handlePRIVMSG(IRCUser &user, const IRCMessage &msg)
 			target.queueSend(reply.c_str(), reply.size());
 		}
 		else
+		{
 			reply = ERR_NOSUCHNICK(servername, user.getNickname(), msg.params[0]);
-		// if (!reply.empty())
-		// 	user.queueSend(reply.c_str(), reply.size());
+		 	user.queueSend(reply.c_str(), reply.size());
+		}
 	}
 }
