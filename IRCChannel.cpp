@@ -256,3 +256,15 @@ void	IRCChannel::clearLimit()
 {
 	limit = -1;
 }
+
+void	IRCChannel::setKey(const std::string &key_toset)
+{
+	key = key_toset;
+	setModeFlag(C_KEY);
+}
+
+void	IRCChannel::removeKey()
+{
+	key.clear();
+	clearModeFlag(C_KEY);
+}

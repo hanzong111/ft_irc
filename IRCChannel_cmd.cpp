@@ -73,31 +73,6 @@ void	IRCServer::C_handlePART(IRCUser &user, const IRCMessage &msg)
 			user.queueSend(reply.c_str(), reply.size());
 }
 
-void	IRCServer::C_handleMODE(IRCUser &user, const IRCMessage &msg)
-{
-	(void)user;
-	(void)msg;
-	std::map<std::string, IRCChannel>::iterator	channel_it;
-	std::string									reply;
-	std::cout << RED << "Inside Chnnel Modes" << DEF_COLOR << std::endl;
-
-	channel_it = channels.find(msg.params[0]);
-	if (channel_it == channels.end())
-		reply = ERR_NOSUCHCHANNEL(servername, user.getNickname(), msg.params[0]);
-	else if (msg.params.size() == 1)
-	{
-		std::string	mode_str = "+";
-
-		if(channel_it->second.isKeyset())
-			mode_str += "k";
-		if(channel_it->second.isTopicset())
-			mode_str += "t";
-		reply = RPL_CHANNELMODEIS(servername, user.getNickname(), msg.params[0], mode_str);
-	}
-	if(!reply.empty())
-		user.queueSend(reply.c_str(), reply.size());
-	
-}
 
 void	IRCServer::C_handleTOPIC(IRCUser &user, const IRCMessage &msg)
 {
@@ -140,4 +115,82 @@ void	IRCServer::C_handleTOPIC(IRCUser &user, const IRCMessage &msg)
 	if (!reply.empty())
 			user.queueSend(reply.c_str(), reply.size());
 
+}
+
+bool isNumeric(const std::string& str) 
+{
+    for (char c : str) 
+	{
+        if (!std::isdigit(c)) 
+		{
+            return (false);
+        }
+    }
+    return (true);
+}
+
+void	IRCServer::C_handleMODE(IRCUser &user, const IRCMessage &msg)
+{
+	std::map<std::string, IRCChannel>::iterator				channel_it;
+	std::string												reply;
+	int														flag_requested;
+	std::cout << RED << "Inside Chnnel Modes" << DEF_COLOR << std::endl;
+
+	channel_it = channels.find(msg.params[0]);
+	if (channel_it == channels.end())
+		reply = ERR_NOSUCHCHANNEL(servername, user.getNickname(), msg.params[0]);
+	else if (msg.params.size() == 1)
+	{
+		std::string	mode_str;
+
+		mode_str = channel_it->second.getModestr();
+		reply = RPL_CHANNELMODEIS(servername, user.getNickname(), msg.params[0], mode_str);
+	}
+	else if (msg.params[1].size() != 2 || !(msg.params[1][0] == '+' || msg.params[1][0] == '-'))
+		reply = ERR_UNKNOWNMODE(servername, user.getNickname(), channel_it->second.getName(), msg.params[1]);
+	else
+	{
+		try
+		{
+			flag_requested = channel_it->second.getFlag_map().at(msg.params[1][1]);
+		}
+		catch (const std::out_of_range &e)
+		{
+			reply = ERR_UNKNOWNMODE(servername, user.getNickname(), channel_it->second.getName(), msg.params[1]);
+			user.queueSend(reply.c_str(), reply.size());
+			return ;
+		}
+		if (msg.params[1][0] == '+')
+		{
+			if(channel_it->second.isUserOper(user.getNickname()))
+				reply = ERR_CHANOPRIVSNEEDED(servername, user.getNickname(), channel_it->second.getName());
+			else if (msg.params.size() < 3)
+				reply = ERR_NEEDMOREPARAMS(servername, user.getNickname(), msg.command);
+			else
+			{
+				if(flag_requested & C_KEY)
+				{
+					if(channel_it->second.isKeyset())
+						reply = ERR_KEYSET(servername, user.getNickname(), channel_it->second.getName());
+					else
+						channel_it->second.setKey(msg.params[2]);
+				}
+				else if(flag_requested & C_LIMIT)
+				{
+					if(isNumeric(msg.params[2]))
+						channel_it->second.setLimit(std::stoi(msg.params[2]))
+					else
+						std::cout << "Lmit can only be numbers" << std::endl;
+				}
+
+			}
+		}
+		else if(msg.params[1][0] == '-')
+		{
+
+		}
+	}
+	if(!reply.empty())
+		user.queueSend(reply.c_str(), reply.size());
+	
 }

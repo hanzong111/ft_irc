@@ -63,6 +63,8 @@ class IRCChannel
 		void				setLimit(int value);
 		int					getLimit() const throw();
 		void				clearLimit();
+		void				setKey(const std::string &key);
+		void				removeKey();
 		
 		bool				isTopicset() const throw();
 		bool				isUserBanned(const std::string nickname) const throw();
