@@ -117,16 +117,13 @@ void	IRCServer::C_handleTOPIC(IRCUser &user, const IRCMessage &msg)
 
 }
 
-bool isNumeric(const std::string& str) 
-{
-    for (char c : str) 
+bool isNumeric(const std::string& str) {
+    for (std::string::const_iterator it = str.begin(); it != str.end(); ++it) 
 	{
-        if (!std::isdigit(c)) 
-		{
-            return (false);
-        }
+        if (!std::isdigit(*it)) 
+            return(false);
     }
-    return (true);
+    return(true);
 }
 
 void	IRCServer::C_handleMODE(IRCUser &user, const IRCMessage &msg)
@@ -178,16 +175,20 @@ void	IRCServer::C_handleMODE(IRCUser &user, const IRCMessage &msg)
 				else if(flag_requested & C_LIMIT)
 				{
 					if(isNumeric(msg.params[2]))
-						channel_it->second.setLimit(std::stoi(msg.params[2]))
+						channel_it->second.setLimit(std::atoi(msg.params[2].c_str()));
 					else
 						std::cout << "Lmit can only be numbers" << std::endl;
+				}
+				else if(flag_requested & C_BANNED)
+				{
+					std::cout << "Inside BANNED" << std::endl;
 				}
 
 			}
 		}
 		else if(msg.params[1][0] == '-')
 		{
-
+			std::cout << "Inside - flag" << std::endl;
 		}
 	}
 	if(!reply.empty())
