@@ -63,6 +63,7 @@
 # define ERR_USERSDONTMATCH(server, target) IRC_RPL("502", server, target) + " :Cannot change mode for other users\r\n"
 # define RPL_UMODEIS(server, target, mode) IRC_RPL("221", server, target) + " " + mode + "\r\n"
 # define ERR_UMODEUNKNOWNFLAG(server, target) IRC_RPL("501", server, target) + " :Unknown MODE flag\r\n"
+# define RPL_CHANNELMODEIS(server, target, channel, mode) IRC_RPL("324", server, target) + " " + channel + " " + mode + "\r\n"
 /*  handleJOIN  */
 # define ERR_NOSUCHCHANNEL(server, target, channelname) IRC_RPL("403", server, target) + " " + channelname + " :No such channel\r\n"
 # define ERR_BADCHANNELKEY(server, target, channelname) IRC_RPL("475", server, target) + " " + channelname + " :Cannot join channel (+k)\r\n"

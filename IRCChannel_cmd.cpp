@@ -85,10 +85,7 @@ void	IRCServer::C_handleMODE(IRCUser &user, const IRCMessage &msg)
 	if (channel_it == channels.end())
 		reply = ERR_NOSUCHCHANNEL(servername, user.getNickname(), msg.params[0]);
 	else if (msg.params.size() == 1)
-	{
-		std::string	mode_str = ":" + servername + " " + user.getNickname() + " #test +kl\r\n";
-		reply = mode_str;
-	}
+		reply = RPL_CHANNELMODEIS(servername, user.getNickname(), msg.params[0], ":+kl");
 	if(!reply.empty())
 		user.queueSend(reply.c_str(), reply.size());
 	
