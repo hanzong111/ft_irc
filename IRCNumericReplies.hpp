@@ -64,6 +64,9 @@
 # define RPL_UMODEIS(server, target, mode) IRC_RPL("221", server, target) + " " + mode + "\r\n"
 # define ERR_UMODEUNKNOWNFLAG(server, target) IRC_RPL("501", server, target) + " :Unknown MODE flag\r\n"
 # define RPL_CHANNELMODEIS(server, target, channel, mode) IRC_RPL("324", server, target) + " " + channel + " " + mode + "\r\n"
+# define ERR_USERNOTINCHANNEL(server, target, channelname) IRC_RPL("441", server, target) + " " + target + " " + channelname + " :They aren't on that channel\r\n"
+# define ERR_KEYSET(server, target, channelname) IRC_RPL("467", server, target) + " " + channelname + " :Channel key already set\r\n"
+# define ERR_UNKNOWNMODE(server, target, channelname, param) IRC_RPL("472", server, target) + " " + param + " :is unknown mode char to me for " + channelname + "\r\n"
 /*  handleJOIN  */
 # define ERR_NOSUCHCHANNEL(server, target, channelname) IRC_RPL("403", server, target) + " " + channelname + " :No such channel\r\n"
 # define ERR_BADCHANNELKEY(server, target, channelname) IRC_RPL("475", server, target) + " " + channelname + " :Cannot join channel (+k)\r\n"

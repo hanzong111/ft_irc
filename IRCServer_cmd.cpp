@@ -267,7 +267,10 @@ void	IRCServer::join_channel(IRCUser &user, std::string &user_key, IRCChannel &c
 	/*	user succesfully joined , sending JOIN command to client.	*/
 	JOIN = ":" + user.getNickname() + " JOIN " + channel.getName() + "\r\n";
 	broadcastToChannel(channel.getName(), JOIN);
-	*reply = RPL_TOPIC(servername, user.getNickname(), channel.getName(), channel.getTopic());
+	if(channel.isTopicset())
+		*reply = RPL_TOPIC(servername, user.getNickname(), channel.getName(), channel.getTopic());
+	else
+		*reply = RPL_NOTOPIC(servername, user.getNickname(), channel.getName());
 	user.queueSend(reply->c_str(), reply->size());
 	std::set<std::string>						user_list;
 	std::set<std::string>::iterator				it;
@@ -399,53 +402,3 @@ void	IRCServer::S_handlePRIVMSG(IRCUser &user, const IRCMessage &msg)
 	}
 }
 
-/*	BUG : if we first set topic in a channel = "hello" , 
-		Then , we assign a NULL to that topic,
-		function returns RPL_TOPIC instead of RPL_NOTOPIC	*/
-void	IRCServer::C_handleTOPIC(IRCUser &user, const IRCMessage &msg)
-{
-	std::string									reply;
-	std::map<std::string, IRCChannel>::iterator	it;
-
-	if(msg.params.empty())
-		reply = ERR_NEEDMOREPARAMS(servername, user.getNickname(), msg.command);
-	else
-	{
-		/*	Checks if channel exists	*/
-		it = channels.find(msg.params[0]);
-		if(it == channels.end())
-			reply = ERR_NOSUCHCHANNEL(servername, user.getNickname(), msg.params[0]);
-		else
-		{
-			/*	Checks if user is on channel	*/
-			if(!it->second.isUserInChannel(user.getNickname()))
-				reply = ERR_NOTONCHANNEL(servername, user.getNickname(), it->second.getName());
-			else if(msg.params.size() == 1)
-			{
-				/*	SHOWS CONTENT OF TOPIC */
-				/*	Checks if there is a TOPIC str anot */
-				if(it->second.isTopicset())
-					reply = RPL_TOPIC(servername, user.getNickname(), it->second.getName(), it->second.getTopic());
-				else
-					reply = RPL_NOTOPIC(servername, user.getNickname(), it->second.getName());
-			}
-			else
-			{
-				/*	Trying to alter content of TOPIC	*/
-				/*	Checks if user is chanop	*/
-				if(!it->second.isUserOper(user.getNickname()))
-					reply = ERR_CHANOPRIVSNEEDED(servername, user.getNickname(), it->second.getName());
-				else
-				{
-					if(msg.params[1].empty())
-						it->second.setTopic(NULL);
-					else
-						it->second.setTopic(msg.params[1]);
-				}
-			}
-		}
-	}
-	if (!reply.empty())
-			user.queueSend(reply.c_str(), reply.size());
-
-}

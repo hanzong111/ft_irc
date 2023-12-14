@@ -6,8 +6,13 @@ IRCChannelModesMap IRCChannel::flags_enum;
 
 void	populateModeMap(IRCChannelModesMap &map)
 {
-	map['c'] = C_KEY;
+	map['k'] = C_KEY;
 	map['l'] = C_LIMIT;
+	map['t'] = C_TOPIC;
+	map['b'] = C_BANNED;
+	map['m'] = C_MUTED;
+	map['o'] = C_OPER;
+	map['O'] = C_CREATOR;
 }
 
 IRCChannel::IRCChannel(const std::string &channel_name) :
@@ -16,7 +21,8 @@ IRCChannel::IRCChannel(const std::string &channel_name) :
 	topic(NULL),
 	key(""),
 	mode_str("+"),
-	creator("")
+	creator(""),
+	limit(-1)
 {
 	banned_users = std::set<std::string>();
 	muted_users = std::set<std::string>();
@@ -32,7 +38,8 @@ IRCChannel::IRCChannel(const std::string &channel_name, const std::string &chann
 	topic(NULL),
 	key(channel_key),
 	mode_str("+"),
-	creator("")
+	creator(""),
+	limit(-1)
 {
 	banned_users = std::set<std::string>();
 	muted_users = std::set<std::string>();
@@ -53,7 +60,8 @@ IRCChannel::IRCChannel(const IRCChannel &other) :
 	banned_users(other.banned_users),
 	channel_opers(other.channel_opers),
 	mode_str("+"),
-	creator(other.creator)
+	creator(other.creator),
+	limit(other.limit)
 {
 	if (other.topic)
 		topic = new std::string(*(other.topic));
@@ -78,9 +86,6 @@ const IRCChannel::UsersList	&IRCChannel::getUsers() const throw()
 
 void	IRCChannel::addUser(const std::string nickname)
 {
-	//std::pair<UsersList::iterator, bool>	result;
-
-	//result = users.insert(nickname);
 	if (banned_users.find(nickname) == banned_users.end())
 		users.insert(nickname);
 }
@@ -134,15 +139,24 @@ const std::string	IRCChannel::getTopic() const throw()
 void	IRCChannel::setTopic(const std::string &topic_str)
 {
 	delete (topic);
-	topic = new std::string(topic_str);
+	if(topic_str == "\"\"")
+	{
+		topic = NULL;
+		clearModeFlag(C_TOPIC);
+	}
+	else
+	{
+		topic = new std::string(topic_str);
+		setModeFlag(C_TOPIC);
+	}
 }
 
 bool	IRCChannel::isTopicset() const throw()
 {
-	if(topic == NULL)
-		return(false);
-	else
+	if(channelmodes & C_TOPIC)
 		return(true);
+	else
+		return(false);
 }
 
 int	IRCChannel::getModeFlags()
@@ -217,4 +231,28 @@ bool	IRCChannel::isUserCreator(const std::string nickname) const throw()
 		return(true);
 	else
 		return(false);
+}
+
+bool	IRCChannel::isLimitset() const throw()
+{
+	if(channelmodes & C_LIMIT)
+		return(true);
+	else
+		return(false);
+}
+
+void	IRCChannel::setLimit(int value)
+{
+	limit = value;
+	setModeFlag(C_LIMIT);
+}
+
+int		IRCChannel::getLimit() const throw()
+{
+	return(limit);
+}
+
+void	IRCChannel::clearLimit()
+{
+	limit = -1;
 }
