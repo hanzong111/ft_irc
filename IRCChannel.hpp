@@ -45,22 +45,25 @@ class IRCChannel
 		IRCChannelModesMap 	&getFlag_map();
 		void				addUser(const std::string nickname);
 		void				removeUser(const std::string nickname);
-		bool				isUserInChannel(const std::string nickname) const throw();
 		void				muteUser(const std::string nickname);
-		bool				isUserMuted(const std::string nickname) const throw();
 		void				banUser(const std::string nickname);
-		bool				isUserBanned(const std::string nickname) const throw();
 		const std::string	getTopic() const throw();
 		void				setTopic(const std::string &topic_str);
-		bool				isTopicset() const throw();
 		int					getModeFlags();
 		void				setModeFlag(int flag);
 		void				clearModeFlag(int flag);
 		void				setCreator(const std::string &user);
 		void				addOper(const std::string nickname);
 		void				removeOper(const std::string nickname);
-		bool				isUserOper(const std::string nickname) const throw();
 		
+		bool				isTopicset() const throw();
+		bool				isUserBanned(const std::string nickname) const throw();
+		bool				isUserInChannel(const std::string nickname) const throw();
+		bool				isUserMuted(const std::string nickname) const throw();
+		bool				isUserOper(const std::string nickname) const throw();
+		bool				isKeyset() const throw();
+		bool				isUserCreator(const std::string nickname) const throw();
+
 	private:
 		// Class contains const member, should not be assignable. 
 		IRCChannel &operator=(const IRCChannel &other);

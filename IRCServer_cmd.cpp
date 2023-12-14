@@ -124,6 +124,11 @@ void	IRCServer::S_handleMODE(IRCUser &user, const IRCMessage &msg)
 	IRCUserModesMap::iterator flag;
 	int			flag_requested = -1;
 
+	if(msg.for_Channel())
+	{
+		C_handleMODE(user, msg);
+		return ;
+	}
 	if (msg.params.size() < 1)
 		reply = ERR_NEEDMOREPARAMS(servername, user.getNickname(), msg.command);
 	else if (user.getNickname() != msg.params[0])

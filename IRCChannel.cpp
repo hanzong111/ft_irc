@@ -202,3 +202,19 @@ bool	IRCChannel::isUserOper(const std::string nickname) const throw()
 {
 	return (channel_opers.find(nickname) != channel_opers.end());
 }
+
+bool	IRCChannel::isKeyset() const throw()
+{
+	if(channelmodes & C_KEY)
+		return(true);
+	else
+		return(false);
+}
+
+bool	IRCChannel::isUserCreator(const std::string nickname) const throw()
+{
+	if(nickname == creator)
+		return(true);
+	else
+		return(false);
+}

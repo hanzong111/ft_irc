@@ -72,3 +72,24 @@ void	IRCServer::C_handlePART(IRCUser &user, const IRCMessage &msg)
 	if (!reply.empty())
 			user.queueSend(reply.c_str(), reply.size());
 }
+
+void	IRCServer::C_handleMODE(IRCUser &user, const IRCMessage &msg)
+{
+	(void)user;
+	(void)msg;
+	std::map<std::string, IRCChannel>::iterator	channel_it;
+	std::string									reply;
+	std::cout << RED << "Inside Chnnel Modes" << DEF_COLOR << std::endl;
+
+	channel_it = channels.find(msg.params[0]);
+	if (channel_it == channels.end())
+		reply = ERR_NOSUCHCHANNEL(servername, user.getNickname(), msg.params[0]);
+	else if (msg.params.size() == 1)
+	{
+		std::string	mode_str = ":" + servername + " " + user.getNickname() + " #test +kl\r\n";
+		reply = mode_str;
+	}
+	if(!reply.empty())
+		user.queueSend(reply.c_str(), reply.size());
+	
+}
