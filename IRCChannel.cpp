@@ -234,13 +234,30 @@ void	IRCChannel::removeOper(const std::string &nickname)
 
 bool	IRCChannel::isUserOper(const std::string &nickname) const throw()
 {
-	return (channel_opers.find(nickname) != channel_opers.end());
+	for (UsersList::iterator it = channel_opers.begin(); it != channel_opers.end(); ++it) 
+	{
+		std::cout << "*it is " + *it + "E" << std::endl;
+		std::cout << "nickname is " + nickname + "E" << std::endl;
+		if(*it == nickname)
+			return(true);
+	}
+	return(false);
 }
+// if(channel_opers.find(nickname) != channel_opers.end())
+// 		return(true);
+// 	else
+// 	return (false);   
+	
+// for (UsersList::iterator it = channel_opers.begin(); it != channel_opers.end(); ++it) 
+// 	{
+// 		if(*it == nickname)
+// 			return(true);
+// 	}
+// 	return(false);
 
 void	IRCChannel::print_opers()
 {
 	std::cout << "printing opers" << std::endl;
-	 UsersList channel_opers;
 	  for (UsersList::iterator it = channel_opers.begin(); it != channel_opers.end(); ++it) {
         std::cout << *it << std::endl;
     }

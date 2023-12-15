@@ -160,6 +160,8 @@ void	IRCServer::C_handleMODE(IRCUser &user, const IRCMessage &msg)
 		if (msg.params[1][0] == '+')
 		{
 			std::cout << GREEN << "We are in channel :" + channel_it->second.getName() << DEF_COLOR << std::endl;
+			channel_it->second.print_opers();
+			std::cout << GREEN << "user.getnickname is  :" + user.getNickname() << DEF_COLOR << std::endl;
 			if(channel_it->second.isUserOper(user.getNickname()))
 			{
 				std::cout << "User is not an operator in channel" << std::endl;
@@ -187,12 +189,20 @@ void	IRCServer::C_handleMODE(IRCUser &user, const IRCMessage &msg)
 				}
 				else if(flag_requested & C_OPER)
 				{
+					std::cout << "inside OPER command" << std::endl;
 					if (msg.params.size() < 3)
+					{
+						std::cout << "need more params" << std::endl;
 						reply = ERR_NEEDMOREPARAMS(servername, user.getNickname(), msg.command);
+					}
 					else if (!channel_it->second.isUserInChannel(msg.params[3]))
+					{
+						std::cout << "inside user not in channel" << std::endl;
 						reply = ERR_USERNOTINCHANNEL(servername, user.getNickname(), channel_it->second.getName());
+					}
 					else
 					{
+						std::cout << "Inside isuseroper" << std::endl;
 						if(!channel_it->second.isUserOper(msg.params[3]))
 							channel_it->second.addOper(msg.params[3]);
 					}
