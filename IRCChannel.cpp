@@ -98,7 +98,10 @@ void	IRCChannel::removeUser(const std::string &nickname)
 
 bool	IRCChannel::isUserInChannel(const std::string &nickname) const throw()
 {
-	return (users.find(nickname) != users.end());
+	if(users.find(nickname) != users.end())
+		return(true);
+	else
+		return (false); 
 }
 
 void	IRCChannel::muteUser(const std::string &nickname)
@@ -140,7 +143,7 @@ const std::string	IRCChannel::getTopic() const throw()
 void	IRCChannel::setTopic(const std::string &topic_str)
 {
 	delete (topic);
-	if(topic_str == "\"\"")
+	if(topic_str == " ")
 	{
 		topic = NULL;
 		clearModeFlag(C_TOPIC);
@@ -205,24 +208,7 @@ void	IRCChannel::setCreator(const std::string &user)
 void	IRCChannel::addOper(const std::string &nickname)
 {
 	if (banned_users.find(nickname) == banned_users.end())
-	{
-		std::cout << "Added user as OPER" << std::endl;
-		// channel_opers.insert(nickname);
-		std::pair<std::set<std::string>::iterator, bool> result = channel_opers.insert(nickname);
-
-   		if (result.second) 
-		{
-       		 std::cout << "Insertion successful" << std::endl;
-			 std::stringstream ss;
-    		ss << channel_opers.size();
-    		std::string size_str = ss.str();
-			std::cout << "sizeof channel_opers is now :" + size_str << std::endl;
-    	}
-    	else 
-		{
-        std::cout << "Insertion failed (element already exists)" << std::endl;
-   		}
-	}
+		channel_opers.insert(nickname);
 	else
 		std::cout << "DID not add user as OPER" << std::endl;
 }
@@ -234,31 +220,24 @@ void	IRCChannel::removeOper(const std::string &nickname)
 
 bool	IRCChannel::isUserOper(const std::string &nickname) const throw()
 {
-	for (UsersList::iterator it = channel_opers.begin(); it != channel_opers.end(); ++it) 
-	{
-		std::cout << "*it is " + *it + "E" << std::endl;
-		std::cout << "nickname is " + nickname + "E" << std::endl;
-		if(*it == nickname)
-			return(true);
-	}
-	return(false);
+	if(channel_opers.find(nickname) != channel_opers.end())
+		return(true);
+	else
+		return (false);   
 }
-// if(channel_opers.find(nickname) != channel_opers.end())
-// 		return(true);
-// 	else
-// 	return (false);   
-	
-// for (UsersList::iterator it = channel_opers.begin(); it != channel_opers.end(); ++it) 
-// 	{
-// 		if(*it == nickname)
-// 			return(true);
-// 	}
-// 	return(false);
 
 void	IRCChannel::print_opers()
 {
 	std::cout << "printing opers" << std::endl;
 	  for (UsersList::iterator it = channel_opers.begin(); it != channel_opers.end(); ++it) {
+        std::cout << *it << std::endl;
+    }
+}
+
+void	IRCChannel::print_users()
+{
+	std::cout << "printing users" << std::endl;
+	  for (UsersList::iterator it = users.begin(); it != users.end(); ++it) {
         std::cout << *it << std::endl;
     }
 }

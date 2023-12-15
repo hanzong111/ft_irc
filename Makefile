@@ -15,7 +15,8 @@ SRC_FILES := 	ft_irc.cpp			\
 				TCPConn.cpp			\
 				TCPHost.cpp			\
 				IRCServer_cmd.cpp	\
-				IRCChannel_cmd.cpp
+				IRCChannel_cmd.cpp	\
+				Channel_flags.cpp
 
 SRC := $(addprefix $(DIR_SRC)/, SRC_FILES)
 OBJ := $(addprefix $(DIR_OBJ)/, $(patsubst %.cpp, %.o, $(SRC_FILES)))

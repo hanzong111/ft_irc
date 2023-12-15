@@ -117,21 +117,11 @@ void	IRCServer::C_handleTOPIC(IRCUser &user, const IRCMessage &msg)
 
 }
 
-bool isNumeric(const std::string& str) {
-    for (std::string::const_iterator it = str.begin(); it != str.end(); ++it) 
-	{
-        if (!std::isdigit(*it)) 
-            return(false);
-    }
-    return(true);
-}
-
 void	IRCServer::C_handleMODE(IRCUser &user, const IRCMessage &msg)
 {
 	std::map<std::string, IRCChannel>::iterator				channel_it;
 	std::string												reply;
 	int														flag_requested;
-	std::cout << RED << "Inside Chnnel Modes" << DEF_COLOR << std::endl;
 
 	channel_it = channels.find(msg.params[0]);
 	if (channel_it == channels.end())
@@ -159,55 +149,19 @@ void	IRCServer::C_handleMODE(IRCUser &user, const IRCMessage &msg)
 		}
 		if (msg.params[1][0] == '+')
 		{
-			std::cout << GREEN << "We are in channel :" + channel_it->second.getName() << DEF_COLOR << std::endl;
-			channel_it->second.print_opers();
-			std::cout << GREEN << "user.getnickname is  :" + user.getNickname() << DEF_COLOR << std::endl;
-			if(channel_it->second.isUserOper(user.getNickname()))
+			if(!channel_it->second.isUserOper(user.getNickname()))
 			{
-				std::cout << "User is not an operator in channel" << std::endl;
 				reply = ERR_CHANOPRIVSNEEDED(servername, user.getNickname(), channel_it->second.getName());
+				std::cout << RED << channel_it->second.getName() + ": User is not an Operator!" << DEF_COLOR << std::endl;
 			}
 			else
 			{
 				if(flag_requested & C_KEY)
-				{
-					if (msg.params.size() < 3)
-						reply = ERR_NEEDMOREPARAMS(servername, user.getNickname(), msg.command);
-					else if(channel_it->second.isKeyset())
-						reply = ERR_KEYSET(servername, user.getNickname(), channel_it->second.getName());
-					else
-						channel_it->second.setKey(msg.params[2]);
-				}
+					c_key(user, msg, channel_it->second);
 				else if(flag_requested & C_LIMIT)
-				{
-					if (msg.params.size() < 3)
-						reply = ERR_NEEDMOREPARAMS(servername, user.getNickname(), msg.command);
-					else if(isNumeric(msg.params[2]))
-						channel_it->second.setLimit(std::atoi(msg.params[2].c_str()));
-					else
-						std::cout << "Lmit can only be numbers" << std::endl;
-				}
+					c_limit(user, msg, channel_it->second);
 				else if(flag_requested & C_OPER)
-				{
-					std::cout << "inside OPER command" << std::endl;
-					if (msg.params.size() < 3)
-					{
-						std::cout << "need more params" << std::endl;
-						reply = ERR_NEEDMOREPARAMS(servername, user.getNickname(), msg.command);
-					}
-					else if (!channel_it->second.isUserInChannel(msg.params[3]))
-					{
-						std::cout << "inside user not in channel" << std::endl;
-						reply = ERR_USERNOTINCHANNEL(servername, user.getNickname(), channel_it->second.getName());
-					}
-					else
-					{
-						std::cout << "Inside isuseroper" << std::endl;
-						if(!channel_it->second.isUserOper(msg.params[3]))
-							channel_it->second.addOper(msg.params[3]);
-					}
-				}
-
+					c_oper(user, msg, channel_it->second);
 			}
 		}
 		else if(msg.params[1][0] == '-')

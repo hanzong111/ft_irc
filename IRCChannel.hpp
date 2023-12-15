@@ -75,6 +75,7 @@ class IRCChannel
 		bool				isLimitset() const throw();
 		bool				isUserCreator(const std::string &nickname) const throw();
 		void				print_opers();
+		void				print_users();
 		const	std::string	&getCreator() const throw();
 
 	private:

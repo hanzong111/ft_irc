@@ -249,8 +249,6 @@ void	IRCServer::create_channel(IRCUser &user, std::map<std::string, std::string>
 	/*	Makes a new IRCChannel object and adds it into our map	*/
 	createChannel(user, channel_name);
 	find = channels.find(channel_name);
-	// find->second.setCreator(user.getNickname());
-	// find->second.addOper(user.getNickname());
 	find->second.print_opers();
 	/*	Joins channel */
 	join_channel(user, channel_key, find->second, reply);
@@ -272,6 +270,7 @@ void	IRCServer::join_channel(IRCUser &user, std::string &user_key, IRCChannel &c
 			return;
 	}
 	channel.addUser(user.getNickname());
+	channel.print_users();
 	/*	user succesfully joined , sending JOIN command to client.	*/
 	JOIN = ":" + user.getNickname() + " JOIN " + channel.getName() + "\r\n";
 	broadcastToChannel(channel.getName(), JOIN);

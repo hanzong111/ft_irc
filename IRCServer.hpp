@@ -91,6 +91,11 @@ class IRCServer : virtual public TCPServer<IRCUser>
 		void	dc_from_channels(IRCUser &user);
 		bool	isChanneltaken(std::string &channelname);
 
+		/*	Flag Functions	*/
+		void	c_key(IRCUser &user, const IRCMessage &msg, IRCChannel &target);
+		void	c_limit(IRCUser &user, const IRCMessage &msg, IRCChannel &target);
+		void	c_oper(IRCUser &user, const IRCMessage &msg, IRCChannel &target);
+
 
 		std::map<std::string, MemFuncPtr>			serv_func_map;
 		// `users_map` maps username to index in `clients`
