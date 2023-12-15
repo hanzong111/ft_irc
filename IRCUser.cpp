@@ -185,3 +185,11 @@ const std::string	&IRCUser::getModestr()
     }
 	return (mode_str);
 }
+
+bool	IRCUser::isOperator() const throw()
+{
+	if(usermodes & OPER)
+		return(true);
+	else
+		return(false);
+}

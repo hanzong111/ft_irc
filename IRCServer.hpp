@@ -49,7 +49,7 @@ class IRCServer : virtual public TCPServer<IRCUser>
 		void			setConnPass(const std::string &pass);
 		virtual void	handleEvents();
 		void			startServer();
-		void			createChannel(const std::string &channel_name);
+		void			createChannel( IRCUser &user, const std::string &channel_name);
 	
 	private:
 		static std::string getCurrentTimeAsStr();

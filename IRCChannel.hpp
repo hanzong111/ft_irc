@@ -48,18 +48,18 @@ class IRCChannel
 		const std::string	&getModestr();
 		const std::string	&getKey();
 		IRCChannelModesMap 	&getFlag_map();
-		void				addUser(const std::string nickname);
-		void				removeUser(const std::string nickname);
-		void				muteUser(const std::string nickname);
-		void				banUser(const std::string nickname);
+		void				addUser(const std::string &nickname);
+		void				removeUser(const std::string &nickname);
+		void				muteUser(const std::string &nickname);
+		void				banUser(const std::string &nickname);
 		const std::string	getTopic() const throw();
 		void				setTopic(const std::string &topic_str);
 		int					getModeFlags();
 		void				setModeFlag(int flag);
 		void				clearModeFlag(int flag);
 		void				setCreator(const std::string &user);
-		void				addOper(const std::string nickname);
-		void				removeOper(const std::string nickname);
+		void				addOper(const std::string &nickname);
+		void				removeOper(const std::string &nickname);
 		void				setLimit(int value);
 		int					getLimit() const throw();
 		void				clearLimit();
@@ -67,13 +67,15 @@ class IRCChannel
 		void				removeKey();
 		
 		bool				isTopicset() const throw();
-		bool				isUserBanned(const std::string nickname) const throw();
-		bool				isUserInChannel(const std::string nickname) const throw();
-		bool				isUserMuted(const std::string nickname) const throw();
-		bool				isUserOper(const std::string nickname) const throw();
+		bool				isUserBanned(const std::string &nickname) const throw();
+		bool				isUserInChannel(const std::string &nickname) const throw();
+		bool				isUserMuted(const std::string &nickname) const throw();
+		bool				isUserOper(const std::string &nickname) const throw();
 		bool				isKeyset() const throw();
 		bool				isLimitset() const throw();
-		bool				isUserCreator(const std::string nickname) const throw();
+		bool				isUserCreator(const std::string &nickname) const throw();
+		void				print_opers();
+		const	std::string	&getCreator() const throw();
 
 	private:
 		// Class contains const member, should not be assignable. 

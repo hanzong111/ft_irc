@@ -1,6 +1,7 @@
 #include "IRCChannel.hpp"
 #include <string>
 #include <utility>
+#include <sstream>
 
 IRCChannelModesMap IRCChannel::flags_enum;
 
@@ -84,28 +85,28 @@ const IRCChannel::UsersList	&IRCChannel::getUsers() const throw()
 	return (users);
 }
 
-void	IRCChannel::addUser(const std::string nickname)
+void	IRCChannel::addUser(const std::string &nickname)
 {
 	if (banned_users.find(nickname) == banned_users.end())
 		users.insert(nickname);
 }
 
-void	IRCChannel::removeUser(const std::string nickname)
+void	IRCChannel::removeUser(const std::string &nickname)
 {
 	users.erase(nickname);
 }
 
-bool	IRCChannel::isUserInChannel(const std::string nickname) const throw()
+bool	IRCChannel::isUserInChannel(const std::string &nickname) const throw()
 {
 	return (users.find(nickname) != users.end());
 }
 
-void	IRCChannel::muteUser(const std::string nickname)
+void	IRCChannel::muteUser(const std::string &nickname)
 {
 	muted_users.insert(nickname);
 }
 
-bool	IRCChannel::isUserMuted(const std::string nickname) const throw()
+bool	IRCChannel::isUserMuted(const std::string &nickname) const throw()
 {
 	if(!muted_users.empty())
 		return (muted_users.find(nickname) != muted_users.end());
@@ -113,12 +114,12 @@ bool	IRCChannel::isUserMuted(const std::string nickname) const throw()
 		return(false);
 }
 
-void	IRCChannel::banUser(const std::string nickname)
+void	IRCChannel::banUser(const std::string &nickname)
 {
 	banned_users.insert(nickname);
 }
 
-bool	IRCChannel::isUserBanned(const std::string nickname) const throw()
+bool	IRCChannel::isUserBanned(const std::string &nickname) const throw()
 {
 	if (banned_users.size() == 0)
 		return (false);
@@ -201,20 +202,48 @@ void	IRCChannel::setCreator(const std::string &user)
 	creator = user;
 }
 
-void	IRCChannel::addOper(const std::string nickname)
+void	IRCChannel::addOper(const std::string &nickname)
 {
 	if (banned_users.find(nickname) == banned_users.end())
-		channel_opers.insert(nickname);
+	{
+		std::cout << "Added user as OPER" << std::endl;
+		// channel_opers.insert(nickname);
+		std::pair<std::set<std::string>::iterator, bool> result = channel_opers.insert(nickname);
+
+   		if (result.second) 
+		{
+       		 std::cout << "Insertion successful" << std::endl;
+			 std::stringstream ss;
+    		ss << channel_opers.size();
+    		std::string size_str = ss.str();
+			std::cout << "sizeof channel_opers is now :" + size_str << std::endl;
+    	}
+    	else 
+		{
+        std::cout << "Insertion failed (element already exists)" << std::endl;
+   		}
+	}
+	else
+		std::cout << "DID not add user as OPER" << std::endl;
 }
 
-void	IRCChannel::removeOper(const std::string nickname)
+void	IRCChannel::removeOper(const std::string &nickname)
 {
 	channel_opers.erase(nickname);
 }
 
-bool	IRCChannel::isUserOper(const std::string nickname) const throw()
+bool	IRCChannel::isUserOper(const std::string &nickname) const throw()
 {
 	return (channel_opers.find(nickname) != channel_opers.end());
+}
+
+void	IRCChannel::print_opers()
+{
+	std::cout << "printing opers" << std::endl;
+	 UsersList channel_opers;
+	  for (UsersList::iterator it = channel_opers.begin(); it != channel_opers.end(); ++it) {
+        std::cout << *it << std::endl;
+    }
 }
 
 bool	IRCChannel::isKeyset() const throw()
@@ -225,7 +254,7 @@ bool	IRCChannel::isKeyset() const throw()
 		return(false);
 }
 
-bool	IRCChannel::isUserCreator(const std::string nickname) const throw()
+bool	IRCChannel::isUserCreator(const std::string &nickname) const throw()
 {
 	if(nickname == creator)
 		return(true);
@@ -267,4 +296,9 @@ void	IRCChannel::removeKey()
 {
 	key.clear();
 	clearModeFlag(C_KEY);
+}
+
+const std::string	&IRCChannel::getCreator() const throw()
+{
+	return(creator);
 }

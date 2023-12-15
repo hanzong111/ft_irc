@@ -106,9 +106,20 @@ void	IRCServer::startServer()
 	}
 }
 
-void	IRCServer::createChannel(const std::string &channel_name)
+void	IRCServer::createChannel( IRCUser &user, const std::string &channel_name)
 {
+	std::map<std::string, IRCChannel>::iterator	it;
+
 	channels.insert(std::pair<std::string, IRCChannel>(channel_name, IRCChannel(channel_name)));
+	it = channels.find(channel_name);
+	if(it == channels.end())
+		std::cout << channel_name + " :No channel found!\n";
+	else
+	{
+		it->second.addOper(user.getNickname());
+		it->second.setCreator(user.getNickname());
+	}
+
 }
 
 size_t	IRCServer::handlePollIn(size_t ind)

@@ -108,8 +108,16 @@ void	IRCServer::S_handleOPER(IRCUser &user, const IRCMessage &msg)
 		reply = ERR_PASSWDMISMATCH(servername, user.getNickname());
 	else
 	{
-		reply = RPL_YOUREOPER(servername, user.getNickname());
-		user.setModeFlag(OPER);
+		if (user.getNickname() == msg.params[0])
+		{
+			if(!user.isOperator())
+			{
+				reply = RPL_YOUREOPER(servername, user.getNickname());
+				user.setModeFlag(OPER);
+			}
+		}
+		else
+			reply = ERR_USERSDONTMATCH(servername, user.getNickname());
 	}
 	if (!reply.empty())
 	{
@@ -239,11 +247,11 @@ void	IRCServer::create_channel(IRCUser &user, std::map<std::string, std::string>
 		return ;
 	}
 	/*	Makes a new IRCChannel object and adds it into our map	*/
-	IRCChannel newchannel(channel_name, channel_key);
-	channels.insert(std::make_pair(channel_name, newchannel));
+	createChannel(user, channel_name);
 	find = channels.find(channel_name);
-	find->second.setCreator(user.getNickname());
-	find->second.addOper(user.getNickname());
+	// find->second.setCreator(user.getNickname());
+	// find->second.addOper(user.getNickname());
+	find->second.print_opers();
 	/*	Joins channel */
 	join_channel(user, channel_key, find->second, reply);
 }
@@ -327,7 +335,10 @@ void	IRCServer::S_handleJOIN(IRCUser &user, const IRCMessage &msg)
 				reply = ERR_NOSUCHCHANNEL(servername, user.getNickname(), it->first);
 		}
 		else
+		{
+			std::cout << "directly joins channel only" << std::endl;
 			join_channel(user, it->second, find_channel->second, &reply);
+		}
 		if (!reply.empty())
 			user.queueSend(reply.c_str(), reply.size());
     }

@@ -159,29 +159,43 @@ void	IRCServer::C_handleMODE(IRCUser &user, const IRCMessage &msg)
 		}
 		if (msg.params[1][0] == '+')
 		{
+			std::cout << GREEN << "We are in channel :" + channel_it->second.getName() << DEF_COLOR << std::endl;
 			if(channel_it->second.isUserOper(user.getNickname()))
+			{
+				std::cout << "User is not an operator in channel" << std::endl;
 				reply = ERR_CHANOPRIVSNEEDED(servername, user.getNickname(), channel_it->second.getName());
-			else if (msg.params.size() < 3)
-				reply = ERR_NEEDMOREPARAMS(servername, user.getNickname(), msg.command);
+			}
 			else
 			{
 				if(flag_requested & C_KEY)
 				{
-					if(channel_it->second.isKeyset())
+					if (msg.params.size() < 3)
+						reply = ERR_NEEDMOREPARAMS(servername, user.getNickname(), msg.command);
+					else if(channel_it->second.isKeyset())
 						reply = ERR_KEYSET(servername, user.getNickname(), channel_it->second.getName());
 					else
 						channel_it->second.setKey(msg.params[2]);
 				}
 				else if(flag_requested & C_LIMIT)
 				{
-					if(isNumeric(msg.params[2]))
+					if (msg.params.size() < 3)
+						reply = ERR_NEEDMOREPARAMS(servername, user.getNickname(), msg.command);
+					else if(isNumeric(msg.params[2]))
 						channel_it->second.setLimit(std::atoi(msg.params[2].c_str()));
 					else
 						std::cout << "Lmit can only be numbers" << std::endl;
 				}
-				else if(flag_requested & C_BANNED)
+				else if(flag_requested & C_OPER)
 				{
-					std::cout << "Inside BANNED" << std::endl;
+					if (msg.params.size() < 3)
+						reply = ERR_NEEDMOREPARAMS(servername, user.getNickname(), msg.command);
+					else if (!channel_it->second.isUserInChannel(msg.params[3]))
+						reply = ERR_USERNOTINCHANNEL(servername, user.getNickname(), channel_it->second.getName());
+					else
+					{
+						if(!channel_it->second.isUserOper(msg.params[3]))
+							channel_it->second.addOper(msg.params[3]);
+					}
 				}
 
 			}
