@@ -173,3 +173,28 @@ void	IRCServer::C_handleMODE(IRCUser &user, const IRCMessage &msg)
 		user.queueSend(reply.c_str(), reply.size());
 	
 }
+
+void	IRCServer::C_handleINVITE(IRCUser &user, const IRCMessage &msg)
+{
+	std::string		reply;
+
+	if (msg.params.size() < 2)
+		reply = ERR_NEEDMOREPARAMS(servername, user.getNickname(), "INVITE");
+	else if (users_map.find(msg.params[0]) == users_map.end())
+		reply = ERR_NOSUCHNICK(servername, user.getNickname(), msg.params[0]);
+	else if (channels.find(msg.params[1]) != channels.end()
+			&& channels.at(msg.params[1]).isUserInChannel(msg.params[0]))
+		reply = ERR_USERONCHANNEL(servername, user.getNickname(), msg.params[0], msg.params[1]);
+	else if (channels.find(msg.params[1]) == channels.end()
+			|| channels.at(msg.params[1]).isUserInChannel(user.getNickname()) == false)
+		reply = ERR_USERNOTINCHANNEL(servername, user.getNickname(), msg.params[1]);
+	if (!reply.empty())
+	{
+		user.queueSend(reply.c_str(), reply.size());
+		return ;
+	}
+	reply = ":" + user.getNickname() + " INVITE " + msg.params[0] + " :" + msg.params[1] + "\r\n";
+	clients[users_map[msg.params[0]]].queueSend(reply.c_str(), reply.size());
+	reply = RPL_INVITING(servername, user.getNickname(), msg.params[1], msg.params[0]);
+	user.queueSend(reply.c_str(), reply.size());
+}

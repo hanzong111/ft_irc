@@ -82,4 +82,8 @@
 # define ERR_NOTONCHANNEL(server, target, channel) (IRC_RPL("442", server, target) + " " + channel + " :You're not on that channel\r\n")
 # define ERR_CHANOPRIVSNEEDED(server, target, channel) (IRC_RPL("482", server, target) + " " + channel + " :You're not channel operator\r\n")
 
+/*   handleINVITE   */
+# define ERR_USERONCHANNEL(server, target, nick_invited, channel) (IRC_RPL("443", server, target) + " " + nick_invited + " " + channel + " :is already on channel\r\n")
+# define RPL_INVITING(server, target, channel, nick_invited) (IRC_RPL("341", server, target) + " " + channel + " " + nick_invited + "\r\n")
+
 #endif
