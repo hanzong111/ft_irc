@@ -187,7 +187,7 @@ void	IRCServer::C_handleINVITE(IRCUser &user, const IRCMessage &msg)
 		reply = ERR_USERONCHANNEL(servername, user.getNickname(), msg.params[0], msg.params[1]);
 	else if (channels.find(msg.params[1]) == channels.end()
 			|| channels.at(msg.params[1]).isUserInChannel(user.getNickname()) == false)
-		reply = ERR_USERNOTINCHANNEL(servername, user.getNickname(), msg.params[1]);
+		reply = ERR_NOTONCHANNEL(servername, user.getNickname(), msg.params[1]);
 	if (!reply.empty())
 	{
 		user.queueSend(reply.c_str(), reply.size());
