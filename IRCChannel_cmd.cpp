@@ -261,3 +261,43 @@ void	IRCServer::C_handleLIST(IRCUser &user, const IRCMessage &msg)
 		user.queueSend(reply.c_str(), reply.size());
 	}
 }
+
+void	IRCServer::C_handleKICK(IRCUser &user, const IRCMessage &msg)
+{
+	std::string										reply;
+	std::map<std::string, IRCChannel>::iterator 	it;
+	std::map<std::string, size_t>::iterator 		target_it;
+	std::string										part_msg = user.getNickname();
+
+	if(msg.params.size() < 3)
+		reply = ERR_NEEDMOREPARAMS(servername, user.getNickname(), msg.command);
+	else
+	{
+		it = channels.find(msg.params[1]);
+		if(it == channels.end())
+			reply = ERR_NOSUCHCHANNEL(servername, user.getNickname(), msg.params[1]);
+		else
+		{
+			if(!it->second.isUserInChannel(user.getNickname()))
+				reply = ERR_NOTONCHANNEL(servername, user.getNickname(), it->second.getName());
+			else if(!it->second.isUserOper(user.getNickname()))
+				reply = ERR_CHANOPRIVSNEEDED(servername, user.getNickname(), it->second.getName());
+			else if(!it->second.isUserInChannel(msg.params[2]))
+				reply = ERR_USERNOTINCHANNEL(servername, user.getNickname(), msg.params[2], it->second.getName());
+			else
+			{       		
+				if(msg.params.size() > 4)
+					part_msg = msg.params[3];
+				broadcastToChannel(it->second.getName(), reply);
+				reply = ":" + user.getNickname() + " KICK " + it->second.getName() + " " + msg.params[2] + " " + part_msg + "\r\n";
+				user.queueSend(reply.c_str(), reply.size());
+				reply = ":" + msg.params[2] + " PART " + it->second.getName() + " " + part_msg + "\r\n";
+				it->second.removeUser(msg.params[2]);
+				if(it->second.isUserOper(msg.params[2]))
+					it->second.removeOper(msg.params[2]);
+			}
+		}
+	}
+	if(!reply.empty())
+		user.queueSend(reply.c_str(), reply.size());
+}

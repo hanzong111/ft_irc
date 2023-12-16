@@ -64,7 +64,7 @@ void	IRCServer::c_oper(IRCUser &user, const IRCMessage &msg, IRCChannel &target)
 	else if (!target.isUserInChannel(msg.params[2]))
 	{
 		std::cout << RED << target.getName() + ": User is not in channel" << DEF_COLOR << std::endl;
-		reply = ERR_USERNOTINCHANNEL(servername, user.getNickname(), target.getName());
+		reply = ERR_USERNOTINCHANNEL(servername, user.getNickname(), msg.params[2], target.getName());
 	}
 	else
 	{
