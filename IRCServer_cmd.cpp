@@ -469,3 +469,49 @@ void	IRCServer::S_handlePRIVMSG(IRCUser &user, const IRCMessage &msg)
 		}
 	}
 }
+
+void	IRCServer::S_handleNOTICE(IRCUser &user, const IRCMessage &msg)
+{
+	std::string reply;
+	std::map<std::string, size_t>::iterator it;
+
+	if(msg.for_Channel())
+	{
+		IRCChannel *target_channel = NULL;
+
+		try
+		{
+			target_channel = &channels.at(msg.params[0]);
+		}
+		catch (const std::out_of_range &e)
+		{
+			return ;
+		}
+		if (target_channel->isUserMuted(user.getNickname())
+			|| target_channel->isUserBanned(user.getNickname()))
+			return ;
+		reply =  ":" + user.getNickname() + "!" + user.getUsername() + "@" + user.getIPAddrStr();
+		reply += " NOTICE " + msg.params[0] + " " + msg.params[1] + "\r\n";
+		IRCChannel::UsersList targets = target_channel->getUsers();
+		if (targets.find(user.getNickname()) == targets.end())
+			return ;
+		else
+			targets.erase(user.getNickname());
+		broadcastToUsers(targets, reply);
+	}
+	else
+	{
+		if(msg.params.size() < 1)
+			return;
+		else if(msg.params.size() < 2)
+			return;
+		it = users_map.find(msg.params[0]);
+		if(it != users_map.end())
+		{
+			IRCUser		&target = clients[it->second];
+			reply =  ":" + user.getNickname() + "!" + user.getUsername() + "@" + user.getIPAddrStr();
+			reply += " NOTICE " + target.getNickname() + " " + msg.params[1] + "\r\n";
+			target.queueSend(reply.c_str(), reply.size());
+		}
+	}
+}
