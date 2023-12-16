@@ -87,6 +87,7 @@ class IRCServer : virtual public TCPServer<IRCUser>
 		void	C_handleTOPIC(IRCUser &user, const IRCMessage &msg);
 		void	C_handleMODE(IRCUser &user, const IRCMessage &msg);
 		void	C_handleINVITE(IRCUser &user, const IRCMessage &msg);
+		void	C_handleLIST(IRCUser &user, const IRCMessage &msg);
 		void	create_channel(IRCUser &user, std::map<std::string, std::string>::iterator 	it, std::string *reply);
 		void	join_channel(IRCUser &user, std::string &user_key, IRCChannel &channel, std::string *reply);
 		void	dc_from_channels(IRCUser &user);

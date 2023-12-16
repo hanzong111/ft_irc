@@ -86,4 +86,9 @@
 # define ERR_USERONCHANNEL(server, target, nick_invited, channel) (IRC_RPL("443", server, target) + " " + nick_invited + " " + channel + " :is already on channel\r\n")
 # define RPL_INVITING(server, target, channel, nick_invited) (IRC_RPL("341", server, target) + " " + channel + " " + nick_invited + "\r\n")
 
+/*   handleLIST     */
+# define ERR_NOSUCHSERVER(server, target, target_server) (IRC_RPL("402", server, target) + " " + target_server + " :No such server\r\n")
+# define RPL_LIST(server, target, channel_name, num_users, topic) (IRC_RPL("322", server, target) + " " + channel_name + " " + num_users + " :" + topic + "\r\n")
+# define RPL_LISTEND(server, target) (IRC_RPL("323", server, target) + " :End of LIST\r\n")
+
 #endif
