@@ -89,17 +89,15 @@ void	IRCServer::S_handleNICK(IRCUser &user, const IRCMessage &msg)
 			std::set<std::string>						user_list;
 			std::set<std::string>::iterator				list_it;
 			std::string									user_str;
-
-			user_list = it->second.getUsers();
-			for(list_it = user_list.begin();list_it != user_list.end(); ++list_it)
-			{
-				user_str += *list_it;
-				user_str += " ";
-			}
-			reply = RPL_NAMREPLY(servername, user.getNickname(),"=", it->second.getName(), user_str);
-			user.queueSend(reply.c_str(), reply.size());
 		}
 	}
+	if (user.isRegistered())
+	{
+		reply = ":" + old_nickname + " NICK " + user.getNickname() + "\r\n";
+		for (size_t i = 0; i < clients.size(); i++)
+			clients[i].queueSend(reply.c_str(), reply.size());
+	}
+
 	// Update `users_map`
 	size_t ind = users_map[old_nickname];
 	users_map.erase(old_nickname);
