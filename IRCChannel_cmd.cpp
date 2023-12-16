@@ -288,10 +288,9 @@ void	IRCServer::C_handleKICK(IRCUser &user, const IRCMessage &msg)
 			{       		
 				if(msg.params.size() > 4)
 					part_msg = msg.params[3];
-				broadcastToChannel(it->second.getName(), reply);
 				reply = ":" + user.getNickname() + " KICK " + it->second.getName() + " " + msg.params[2] + " " + part_msg + "\r\n";
-				user.queueSend(reply.c_str(), reply.size());
-				reply = ":" + msg.params[2] + " PART " + it->second.getName() + " " + part_msg + "\r\n";
+				broadcastToChannel(it->second.getName(), reply);
+				reply.empty();
 				it->second.removeUser(msg.params[2]);
 				if(it->second.isUserOper(msg.params[2]))
 					it->second.removeOper(msg.params[2]);
