@@ -290,7 +290,7 @@ void	IRCServer::C_handleKICK(IRCUser &user, const IRCMessage &msg)
 					part_msg = msg.params[3];
 				reply = ":" + user.getNickname() + " KICK " + it->second.getName() + " " + msg.params[2] + " " + part_msg + "\r\n";
 				broadcastToChannel(it->second.getName(), reply);
-				reply.empty();
+				reply.clear();
 				it->second.removeUser(msg.params[2]);
 				if(it->second.isUserOper(msg.params[2]))
 					it->second.removeOper(msg.params[2]);
