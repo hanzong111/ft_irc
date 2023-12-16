@@ -19,6 +19,7 @@ IRCMessage::IRCMessage(const std::string &msg) :
 
 	if (msg_len == 0 || msg_len == msg.npos)
 		return ;
+	ind = msg.find_first_not_of(" \n", 0);
 	if (msg[0] == ':')
 	{
 		len = getTokenLen(msg, 1, " ");
