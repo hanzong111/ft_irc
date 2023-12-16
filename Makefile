@@ -1,4 +1,5 @@
 NAME := ft_irc
+BOT_NAME := irc_bot
 
 DIR_SRC := .
 DIR_INCL := .
@@ -30,7 +31,9 @@ SERVER_OBJ := $(addprefix $(DIR_OBJ)/, $(patsubst %.cpp, %.o, $(SERVER_SRC_FILES
 BOT_SRC := $(addprefix $(DIR_SRC)/, BOT_SRC_FILES)
 BOT_OBJ := $(addprefix $(DIR_OBJ)/, $(patsubst %.cpp, %.o, $(BOT_SRC_FILES)))
 
-all: $(NAME) bot
+all: $(NAME) $(BOT_NAME)
+
+bot: $(BOT_NAME)
 
 clean:
 	@rm -rf $(DIR_OBJ)
@@ -41,8 +44,8 @@ fclean:clean
 
 re:fclean all
 
-bot: $(DIR_OBJ) $(BOT_OBJ)
-	$(CXX) -o irc_bot $(BOT_OBJ) $(CXX_FLAGS)
+$(BOT_NAME): $(DIR_OBJ) $(BOT_OBJ)
+	$(CXX) -o $@ $(BOT_OBJ) $(CXX_FLAGS)
 
 $(NAME): $(DIR_OBJ) $(SERVER_OBJ)
 	$(CXX) -o $@ $(SERVER_OBJ) $(CXX_FLAGS)
