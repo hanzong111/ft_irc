@@ -91,4 +91,7 @@
 # define RPL_LIST(server, target, channel_name, num_users, topic) (IRC_RPL("322", server, target) + " " + channel_name + " " + num_users + " :" + topic + "\r\n")
 # define RPL_LISTEND(server, target) (IRC_RPL("323", server, target) + " :End of LIST\r\n")
 
+/*   handleNAMES    */
+# define RPL_ENDOFNAMES(server, target, channel) (IRC_RPL("366", server, target) + " " +channel + " :End of NAMES list\r\n")
+
 #endif

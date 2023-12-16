@@ -272,6 +272,7 @@ void	IRCServer::populateServFuncMap()
 	serv_func_map["INVITE"] = &IRCServer::C_handleINVITE;
 	serv_func_map["LIST"] = &IRCServer::C_handleLIST;
 	serv_func_map["KICK"] = &IRCServer::C_handleKICK;
+	serv_func_map["NAMES"] = &IRCServer::C_handleNAMES;
 }
 
 std::string	IRCServer::getCurrentTimeAsStr()

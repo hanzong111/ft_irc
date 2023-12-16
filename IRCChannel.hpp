@@ -45,6 +45,7 @@ class IRCChannel
 
 		const std::string	&getName() const throw();
 		const UsersList		&getUsers() const throw();
+		std::string			getUsersAsStr(char separator) const throw();
 		const std::string	&getModestr();
 		const std::string	&getKey();
 		IRCChannelModesMap 	&getFlag_map();
