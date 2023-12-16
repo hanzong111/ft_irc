@@ -336,7 +336,15 @@ void	IRCServer::S_handleJOIN(IRCUser &user, const IRCMessage &msg)
 		else
 		{
 			std::cout << "directly joins channel only" << std::endl;
-			join_channel(user, it->second, find_channel->second, &reply);
+			if(find_channel->second.isLimitset())
+			{
+				if(find_channel->second.getintNumUsers() < find_channel->second.getLimit())
+					join_channel(user, it->second, find_channel->second, &reply);
+				else
+					reply = ERR_CHANNELISFULL(servername, user.getNickname(), find_channel->second.getName());
+			}	
+			else
+				join_channel(user, it->second, find_channel->second, &reply);
 		}
 		if (!reply.empty())
 			user.queueSend(reply.c_str(), reply.size());

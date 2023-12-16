@@ -287,12 +287,16 @@ void	IRCChannel::setLimit(int value)
 
 int		IRCChannel::getLimit() const throw()
 {
-	return(limit);
+	if(limit > 0)
+		return(limit);
+	else
+		return(-1);
 }
 
 void	IRCChannel::clearLimit()
 {
 	limit = -1;
+	clearModeFlag(C_LIMIT);
 }
 
 void	IRCChannel::setKey(const std::string &key_toset)
@@ -313,6 +317,11 @@ const std::string	&IRCChannel::getCreator() const throw()
 }
 
 size_t	IRCChannel::getNumUsers() const throw()
+{
+	return (users.size());
+}
+
+int		IRCChannel::getintNumUsers() const throw()
 {
 	return (users.size());
 }
