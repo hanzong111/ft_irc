@@ -269,31 +269,31 @@ void	IRCServer::C_handleKICK(IRCUser &user, const IRCMessage &msg)
 	std::map<std::string, size_t>::iterator 		target_it;
 	std::string										part_msg = user.getNickname();
 
-	if(msg.params.size() < 3)
+	if(msg.params.size() < 2)
 		reply = ERR_NEEDMOREPARAMS(servername, user.getNickname(), msg.command);
 	else
 	{
-		it = channels.find(msg.params[1]);
+		it = channels.find(msg.params[0]);
 		if(it == channels.end())
-			reply = ERR_NOSUCHCHANNEL(servername, user.getNickname(), msg.params[1]);
+			reply = ERR_NOSUCHCHANNEL(servername, user.getNickname(), msg.params[0]);
 		else
 		{
 			if(!it->second.isUserInChannel(user.getNickname()))
 				reply = ERR_NOTONCHANNEL(servername, user.getNickname(), it->second.getName());
 			else if(!it->second.isUserOper(user.getNickname()))
 				reply = ERR_CHANOPRIVSNEEDED(servername, user.getNickname(), it->second.getName());
-			else if(!it->second.isUserInChannel(msg.params[2]))
-				reply = ERR_USERNOTINCHANNEL(servername, user.getNickname(), msg.params[2], it->second.getName());
+			else if(!it->second.isUserInChannel(msg.params[1]))
+				reply = ERR_USERNOTINCHANNEL(servername, user.getNickname(), msg.params[1], it->second.getName());
 			else
 			{       		
-				if(msg.params.size() > 4)
-					part_msg = msg.params[3];
-				reply = ":" + user.getNickname() + " KICK " + it->second.getName() + " " + msg.params[2] + " " + part_msg + "\r\n";
+				if(msg.params.size() > 2)
+					part_msg = msg.params[2];
+				reply = ":" + user.getNickname() + " KICK " + it->second.getName() + " " + msg.params[1] + " " + part_msg + "\r\n";
 				broadcastToChannel(it->second.getName(), reply);
 				reply.clear();
-				it->second.removeUser(msg.params[2]);
-				if(it->second.isUserOper(msg.params[2]))
-					it->second.removeOper(msg.params[2]);
+				it->second.removeUser(msg.params[1]);
+				if(it->second.isUserOper(msg.params[1]))
+					it->second.removeOper(msg.params[1]);
 			}
 		}
 	}
