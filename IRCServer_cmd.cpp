@@ -105,7 +105,7 @@ void	IRCServer::S_handleNICK(IRCUser &user, const IRCMessage &msg)
 	users_map.erase(old_nickname);
 	users_map[msg.params[0]] = ind;
 	// Check if registration is completed
-	if (!user.getUsername().empty())
+	if (!user.getUsername().empty() && !user.isRegistered())
 	{
 		user.makeRegistered();
 		sendWelcomeMessages(user);
@@ -133,7 +133,8 @@ void	IRCServer::S_handleUSER(IRCUser &user, const IRCMessage &msg)
 	int	mode = std::atoi(msg.params[1].c_str()) & (WALLOPS | INVISIBLE);
 	user.setModeFlag(mode);
 	// Check if registration is completed
-	if (user.getNickname().find(IRCUSER_DEFAULT_NICK_PREFIX) != 0)
+	if (user.getNickname().find(IRCUSER_DEFAULT_NICK_PREFIX) != 0
+		&& !user.isRegistered())
 	{
 		user.makeRegistered();
 		sendWelcomeMessages(user);
