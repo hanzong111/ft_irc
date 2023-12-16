@@ -516,3 +516,18 @@ void	IRCServer::S_handleNOTICE(IRCUser &user, const IRCMessage &msg)
 		}
 	}
 }
+
+void	IRCServer::S_handleDIE(IRCUser &user, const IRCMessage &msg)
+{
+	(void)msg;
+	std::string reply;
+	
+	if (users_map.find(user.getNickname()) == users_map.end()
+		|| !clients[users_map[user.getNickname()]].isOperator())
+	{
+		reply = ERR_NOPRIVILEGES(servername, user.getNickname());
+		user.queueSend(reply.c_str(), reply.size());
+		return ;
+	}
+	shutdown = true;
+}

@@ -21,7 +21,8 @@ IRCServer::IRCServer(const std::string &ip_addr, uint16_t port_num) :
 	TCPHost(),
 	TCPServer(ip_addr, port_num),
 	servername(ip_addr),
-	time_created(IRCServer::getCurrentTimeAsStr())
+	time_created(IRCServer::getCurrentTimeAsStr()),
+	shutdown(false)
 {
 	if (serv_func_map.empty())
 		populateServFuncMap();
@@ -47,15 +48,13 @@ IRCServer &IRCServer::operator=(const IRCServer &other)
 	servername = other.servername;
 	channels = other.channels;
 	time_created = other.time_created;
+	shutdown = other.shutdown;
 	updateUsersMap();
 	return (*this);
 }
 
 IRCServer::~IRCServer()
-{
-	if (fd != -1 && close(fd) == -1)
-		std::cerr << "Warning: Failed to close socket" << std::endl;
-}
+{}
 
 void	IRCServer::setConnPass(const std::string &pass)
 {
@@ -94,10 +93,12 @@ void	IRCServer::handleEvents()
 
 void	IRCServer::startServer()
 {
+	std::string reply;
+
 	startListening();
 	std::cout << "Server is now listening for requests on " << getIPAddrStr()
 			<< ":" << getPortNumH() << std::endl;
-	while (true)
+	while (!shutdown)
 	{
 		std::cout << "Polling for events" << std::endl;
 		pollEvents(-1);
@@ -267,6 +268,7 @@ void	IRCServer::populateServFuncMap()
 	serv_func_map["JOIN"] = &IRCServer::S_handleJOIN;
 	serv_func_map["PRIVMSG"] = &IRCServer::S_handlePRIVMSG;
 	serv_func_map["NOTICE"] = &IRCServer::S_handleNOTICE;
+	serv_func_map["DIE"] = &IRCServer::S_handleDIE;
 	serv_func_map["WHO"] = &IRCServer::C_handleWHO;
 	serv_func_map["PART"] = &IRCServer::C_handlePART;
 	serv_func_map["TOPIC"] = &IRCServer::C_handleTOPIC;
