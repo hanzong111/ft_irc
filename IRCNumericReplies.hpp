@@ -94,5 +94,4 @@
 /*   handleNAMES    */
 # define RPL_ENDOFNAMES(server, target, channel) (IRC_RPL("366", server, target) + " " +channel + " :End of NAMES list\r\n")
 
-
 #endif
