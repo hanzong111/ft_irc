@@ -183,7 +183,7 @@ void	IRCServer::S_handleQUIT(IRCUser &user, const IRCMessage &msg)
 	size_t		ind;
 	std::string	reply;
 
-	if (msg.params.size() != 1)
+	if (msg.params.size() >= 1)
 		reply = ":" + user.getNickname() + "ERROR :" + msg.params[1] + "\r\n";
 	else
 		reply = ":" + user.getNickname() + "ERROR :\r\n";
@@ -411,4 +411,3 @@ void	IRCServer::S_handlePRIVMSG(IRCUser &user, const IRCMessage &msg)
 		}
 	}
 }
-
