@@ -37,6 +37,7 @@ clean:
 
 fclean:clean
 	@rm -f $(NAME)
+	@rm -f irc_bot
 
 re:fclean all
 
