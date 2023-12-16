@@ -20,6 +20,7 @@ class IRCMessage
 
 		std::string					prefix;
 		std::string 				command;
+		std::string					numeric_code;
 		std::vector<std::string>	params;
 
 	private:

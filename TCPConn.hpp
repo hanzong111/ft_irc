@@ -31,6 +31,7 @@ class TCPConn : virtual public TCPHost
 			partial_receive = false;
 			pollfd_struct = NULL;
 		};
+		TCPConn(const std::string &server_ip_addr, uint16_t server_port_num);
 		TCPConn(const TCPConn &other);
 		TCPConn &operator=(const TCPConn &other);
 		virtual ~TCPConn();

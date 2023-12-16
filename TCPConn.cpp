@@ -22,6 +22,28 @@ TCPConn::TCPConn() :
 	pollfd_struct = NULL;
 }
 
+TCPConn::TCPConn(const std::string &server_ip_addr, uint16_t server_port_num) :
+	TCPHost()
+{
+	sockaddr_in	server_addr;
+
+	fd = socket(AF_INET, SOCK_STREAM, 0);
+	if (fd == -1)
+		throw std::runtime_error("socket: " + std::string(std::strerror(errno)));
+	server_addr.sin_family = AF_INET;
+	server_addr.sin_addr.s_addr = inet_addr(server_ip_addr.c_str());
+	server_addr.sin_port = htons(server_port_num);
+	if (connect(fd, (sockaddr *) &server_addr, sizeof(server_addr)) == -1)
+		throw std::runtime_error(std::string("connect: ") + strerror(errno));
+	fcntl(fd, F_SETFL, O_NONBLOCK);
+	recv_buf = new char[TCPSERVER_INIT_BUF_SIZE];
+	recv_buf_size = TCPSERVER_INIT_BUF_SIZE; 
+	recv_data_size = 0;
+	recv_retrieve_size = 0;
+	partial_receive = false;
+	pollfd_struct = NULL;
+}
+
 /**
  * @note Copies will share the same pollfd struct, and sending may not work 
  * correctly since the copies will all have separate send_queue and the POLLOUT 

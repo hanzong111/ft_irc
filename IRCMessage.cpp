@@ -26,8 +26,16 @@ IRCMessage::IRCMessage(const std::string &msg) :
 		prefix = msg.substr(1, len);
 		ind = len + 2;
 	}
-	len = msg.find_first_not_of("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ", ind) - ind;
-	command = msg.substr(ind, len);
+	if (msg[ind] >= '0' && msg[ind] <= '9')
+	{
+		len = msg.find_first_not_of("0123456789", ind) - ind;
+		numeric_code = msg.substr(ind, len);
+	}
+	else
+	{
+		len = msg.find_first_not_of("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ", ind) - ind;
+		command = msg.substr(ind, len);
+	}
 	// Not checking if command is valid here.
 	ind += len;
 	// Skip to next space.
