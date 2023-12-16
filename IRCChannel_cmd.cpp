@@ -1,7 +1,8 @@
 # include "IRCServer.hpp"
 # include "IRCUser.hpp"
 # include "IRCNumericReplies.hpp"
-# include <iostream>
+#include "utils.hpp"
+#include <iostream>
 #include <cstdlib>
 
 void	IRCServer::C_handleWHO(IRCUser &user, const IRCMessage &msg)
@@ -197,4 +198,53 @@ void	IRCServer::C_handleINVITE(IRCUser &user, const IRCMessage &msg)
 	clients[users_map[msg.params[0]]].queueSend(reply.c_str(), reply.size());
 	reply = RPL_INVITING(servername, user.getNickname(), msg.params[1], msg.params[0]);
 	user.queueSend(reply.c_str(), reply.size());
+}
+
+void	IRCServer::C_handleLIST(IRCUser &user, const IRCMessage &msg)
+{
+	std::string					reply;
+	std::vector<std::string>	channel_names;
+
+	if (msg.params.size() >= 2 && msg.params[1] != servername)
+	{
+		reply = ERR_NOSUCHSERVER(servername, user.getNickname(), msg.params[1]);
+		user.queueSend(reply.c_str(), reply.size());
+		return ;
+	}
+	if (msg.params.size() == 0)
+	{
+		std::map<std::string, IRCChannel>::iterator it;
+
+		for (it = channels.begin(); it != channels.end(); it++)
+		{
+			reply = RPL_LIST(servername, user.getNickname(), it->second.getName(),
+							to_string(it->second.getNumUsers()), it->second.getTopic());
+			user.queueSend(reply.c_str(), reply.size());
+		}
+		reply = RPL_LISTEND(servername, user.getNickname());
+		user.queueSend(reply.c_str(), reply.size());
+	}
+	else
+	{
+		std::vector<std::string>::iterator it;
+
+		channel_names = split(msg.params[0], ',');
+		for (it = channel_names.begin(); it < channel_names.end(); it++)
+		{
+			try
+			{
+				IRCChannel &channel = channels.at(*it);
+				reply = RPL_LIST(servername, user.getNickname(), *it,
+							to_string(channel.getNumUsers()), channel.getTopic());
+				user.queueSend(reply.c_str(), reply.size());
+			}
+			catch (const std::out_of_range &e)
+			{
+				// Should we send ERR_NOSUCHCHANNEL?
+				continue ;
+			}
+		}
+		reply = RPL_LISTEND(servername, user.getNickname());
+		user.queueSend(reply.c_str(), reply.size());
+	}
 }
