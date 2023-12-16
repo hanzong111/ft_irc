@@ -357,10 +357,19 @@ void	IRCServer::S_handlePRIVMSG(IRCUser &user, const IRCMessage &msg)
 		try
 		{
 			target_channel = &channels.at(msg.params[0]);
+
 		}
 		catch (const std::out_of_range &e)
 		{
 			// Channel doesn't exist, hence sender cannot be in the channel, deny. 
+			reply = ERR_CANNOTSENDTOCHAN(servername, user.getNickname(), msg.params[0]);
+			user.queueSend(reply.c_str(), reply.size());
+			return ;
+		}
+		if (target_channel->isUserMuted(user.getNickname())
+			|| target_channel->isUserBanned(user.getNickname()))
+		{
+			// User is either muted in or banned from channel, deny. 
 			reply = ERR_CANNOTSENDTOCHAN(servername, user.getNickname(), msg.params[0]);
 			user.queueSend(reply.c_str(), reply.size());
 			return ;
