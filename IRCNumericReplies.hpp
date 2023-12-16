@@ -95,4 +95,7 @@
 /*   handleNAMES    */
 # define RPL_ENDOFNAMES(server, target, channel) (IRC_RPL("366", server, target) + " " +channel + " :End of NAMES list\r\n")
 
+/*   handleDIE */
+# define ERR_NOPRIVILEGES(server, target) (IRC_RPL("481", server, target) + " :Permission Denied- You're not an IRC operator\r\n")
+
 #endif

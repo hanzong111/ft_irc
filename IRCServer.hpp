@@ -81,6 +81,7 @@ class IRCServer : virtual public TCPServer<IRCUser>
 		void	S_handleJOIN(IRCUser &user, const IRCMessage &msg);
 		void	S_handlePRIVMSG(IRCUser &user, const IRCMessage &msg);
 		void	S_handleNOTICE(IRCUser &user, const IRCMessage &msg);
+		void	S_handleDIE(IRCUser &user, const IRCMessage &msg);
 
 		/*	Channel Commands	*/
 		void	C_handleWHO(IRCUser &user, const IRCMessage &msg);
@@ -111,6 +112,7 @@ class IRCServer : virtual public TCPServer<IRCUser>
 		std::string									conn_pass;
 		std::string									servername;
 		std::string									time_created;
+		bool										shutdown;
 };
 
 #endif
