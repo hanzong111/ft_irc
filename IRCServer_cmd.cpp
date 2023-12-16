@@ -365,6 +365,14 @@ void	IRCServer::S_handlePRIVMSG(IRCUser &user, const IRCMessage &msg)
 			user.queueSend(reply.c_str(), reply.size());
 			return ;
 		}
+		if (target_channel->isUserMuted(user.getNickname())
+			|| target_channel->isUserBanned(user.getNickname()))
+		{
+			// User is either muted in or banned from channel, deny. 
+			reply = ERR_CANNOTSENDTOCHAN(servername, user.getNickname(), msg.params[0]);
+			user.queueSend(reply.c_str(), reply.size());
+			return ;
+		}
 		reply =  ":" + user.getNickname() + "!" + user.getUsername() + "@" + user.getIPAddrStr();
 		reply += " PRIVMSG " + msg.params[0] + " " + msg.params[1] + "\r\n";
 		IRCChannel::UsersList targets = target_channel->getUsers();
