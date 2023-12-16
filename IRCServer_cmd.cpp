@@ -357,7 +357,6 @@ void	IRCServer::S_handlePRIVMSG(IRCUser &user, const IRCMessage &msg)
 		try
 		{
 			target_channel = &channels.at(msg.params[0]);
-
 		}
 		catch (const std::out_of_range &e)
 		{
