@@ -233,10 +233,16 @@ void	IRCServer::S_handleQUIT(IRCUser &user, const IRCMessage &msg)
 		reply = ":" + user.getNickname() + " ERROR\r\n";
 	if (!reply.empty())
 		user.queueSend(reply.c_str(), reply.size());
+	reply = ":" + user.getNickname() + " QUIT";
+	if (msg.params.size() >= 1)
+		reply += " " + msg.params[0];
+	reply += "\r\n";
 	ind = users_map.at(user.getNickname());
 	users_map.erase(clients[ind].getNickname());
 	removeClient(clients[ind]);
 	updateUsersMap();
+	for (size_t i = 0; i < clients.size(); i++)
+		clients[i].queueSend(reply.c_str(), reply.size());
 }
 
 std::vector<std::string> split(const std::string& str, char delimiter)
