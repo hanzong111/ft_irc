@@ -53,7 +53,6 @@ IRCMessage::IRCMessage(const std::string &msg) :
 		is_valid = false;
 	if (params.size() > 0)
 	{
-		std::cout << params[0][0] << std::endl;
 		if (params[0][0] == '#' || params[0][0] == '&' || params[0][0] == '+' || params[0][0] == '!')
 			for_channel = true;
 	}
