@@ -83,7 +83,69 @@ void	IRCServer::c_oper(IRCUser &user, const IRCMessage &msg, IRCChannel &target)
 void	IRCServer::c_banned(IRCUser &user, const IRCMessage &msg, IRCChannel &target)
 {
 	std::string	reply;
+	
+	if(msg.params.size() < 3)
+		reply = ERR_NEEDMOREPARAMS(servername, user.getNickname(), msg.command);
+	else if(target.isUserBanned(msg.params[2])) 
+		std::cout << RED << target.getName() + ": User is ald in ban list" << DEF_COLOR << std::endl;
+	else
+	{
+		target.banUser(msg.params[2]);
+		std::cout << GREEN << target.getName() + ": User is being added into ban list" << DEF_COLOR << std::endl;
+	}
+	if(!reply.empty())
+		user.queueSend(reply.c_str(), reply.size());
+}
 
+void	IRCServer::c_unban(IRCUser &user, const IRCMessage &msg, IRCChannel &target)
+{
+	std::string	reply;
+	
+	if(msg.params.size() < 3)
+		reply = ERR_NEEDMOREPARAMS(servername, user.getNickname(), msg.command);
+	else if(!target.isUserBanned(msg.params[2])) 
+		std::cout << RED << target.getName() + ": User is not in ban list" << DEF_COLOR << std::endl;
+	else
+	{
+		target.removeBannedUser(msg.params[2]);
+		std::cout << GREEN << target.getName() + ": User is being removed from ban list" << DEF_COLOR << std::endl;
+	}
+	if(!reply.empty())
+		user.queueSend(reply.c_str(), reply.size());
+}
+
+void	IRCServer::c_mute(IRCUser &user, const IRCMessage &msg, IRCChannel &target)
+{
+	std::string	reply;
+	
+	if(msg.params.size() < 3)
+		reply = ERR_NEEDMOREPARAMS(servername, user.getNickname(), msg.command);
+	else if(!target.isUserInChannel(msg.params[2]))
+		std::cout << RED << target.getName() + ": User is not in channel" << DEF_COLOR << std::endl;
+	else if(target.isUserMuted(msg.params[2])) 
+		std::cout << RED << target.getName() + ": User is ald in mute list" << DEF_COLOR << std::endl;
+	else
+	{
+		target.muteUser(msg.params[2]);
+		std::cout << GREEN << target.getName() + ": User is being added into mute list" << DEF_COLOR << std::endl;
+	}
+	if(!reply.empty())
+		user.queueSend(reply.c_str(), reply.size());
+}
+
+void	IRCServer::c_unmute(IRCUser &user, const IRCMessage &msg, IRCChannel &target)
+{
+	std::string	reply;
+	
+	if(msg.params.size() < 3)
+		reply = ERR_NEEDMOREPARAMS(servername, user.getNickname(), msg.command);
+	else if(!target.isUserMuted(msg.params[2])) 
+		std::cout << RED << target.getName() + ": User is not in mute list" << DEF_COLOR << std::endl;
+	else
+	{
+		target.removeMutedUser(msg.params[2]);
+		std::cout << GREEN << target.getName() + ": User is being removed from mute list" << DEF_COLOR << std::endl;
+	}
 	if(!reply.empty())
 		user.queueSend(reply.c_str(), reply.size());
 }

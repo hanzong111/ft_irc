@@ -165,11 +165,22 @@ void	IRCServer::C_handleMODE(IRCUser &user, const IRCMessage &msg)
 					c_oper(user, msg, channel_it->second);
 				else if(flag_requested & C_BANNED)
 					c_banned(user, msg, channel_it->second);
+				else if(flag_requested & C_MUTED)
+					c_mute(user, msg, channel_it->second);
 			}
 		}
 		else if(msg.params[1][0] == '-')
 		{
-			std::cout << "Inside - flag" << std::endl;
+			if(flag_requested & C_KEY)
+				channel_it->second.removeKey();
+			else if(flag_requested & C_LIMIT)
+				channel_it->second.clearLimit();
+			else if(flag_requested & C_OPER)
+				channel_it->second.removeOper(user.getNickname());
+			else if(flag_requested & C_BANNED)
+				c_unban(user, msg, channel_it->second);
+			else if(flag_requested & C_MUTED)
+				c_unmute(user, msg, channel_it->second);
 		}
 	}
 	if(!reply.empty())

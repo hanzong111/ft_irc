@@ -78,6 +78,8 @@ class IRCChannel
 		void				print_opers();
 		void				print_users();
 		const	std::string	&getCreator() const throw();
+		void				removeBannedUser(const std::string &nickname);
+		void				removeMutedUser(const std::string &nickname);
 
 	private:
 		// Class contains const member, should not be assignable. 
