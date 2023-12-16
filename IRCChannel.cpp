@@ -85,6 +85,19 @@ const IRCChannel::UsersList	&IRCChannel::getUsers() const throw()
 	return (users);
 }
 
+std::string	IRCChannel::getUsersAsStr(char separator) const throw()
+{
+	std::string	users_str;
+	UsersList::iterator	it;
+
+	if (users.empty())
+		return ("");
+	for (it = users.begin(); it != users.end(); it++)
+		users_str += *it + separator;
+	users_str.erase(users_str.end() - 1);
+	return (users_str);
+}
+
 void	IRCChannel::addUser(const std::string &nickname)
 {
 	if (banned_users.find(nickname) == banned_users.end())

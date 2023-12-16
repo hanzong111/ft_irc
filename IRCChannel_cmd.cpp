@@ -301,3 +301,50 @@ void	IRCServer::C_handleKICK(IRCUser &user, const IRCMessage &msg)
 	if(!reply.empty())
 		user.queueSend(reply.c_str(), reply.size());
 }
+
+void	IRCServer::C_handleNAMES(IRCUser &user, const IRCMessage &msg)
+{
+	std::string					reply;
+	std::vector<std::string>	channel_names;
+
+	if (msg.params.size() >= 2 && msg.params[1] != servername)
+	{
+		reply = ERR_NOSUCHSERVER(servername, user.getNickname(), msg.params[1]);
+		user.queueSend(reply.c_str(), reply.size());
+		return ;
+	}
+	if (msg.params.size() == 0)
+	{
+		std::map<std::string, IRCChannel>::iterator it;
+
+		for (it = channels.begin(); it != channels.end(); it++)
+		{
+			reply = RPL_NAMREPLY(servername, user.getNickname(), "=",
+							it->second.getName(), it->second.getUsersAsStr(' '));
+			reply += RPL_ENDOFNAMES(servername, user.getNickname(), it->second.getName());
+			user.queueSend(reply.c_str(), reply.size());
+		}
+	}
+	else
+	{
+		std::vector<std::string>::iterator it;
+
+		channel_names = split(msg.params[0], ',');
+		for (it = channel_names.begin(); it < channel_names.end(); it++)
+		{
+			try
+			{
+				IRCChannel &channel = channels.at(*it);
+				reply = RPL_NAMREPLY(servername, user.getNickname(), "=",
+							channel.getName(), channel.getUsersAsStr(' '));
+				reply += RPL_ENDOFNAMES(servername, user.getNickname(), channel.getName());
+				user.queueSend(reply.c_str(), reply.size());
+			}
+			catch (const std::out_of_range &e)
+			{
+				reply = RPL_ENDOFNAMES(servername, user.getNickname(), *it);
+				user.queueSend(reply.c_str(), reply.size());
+			}
+		}
+	}
+}
