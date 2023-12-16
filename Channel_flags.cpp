@@ -79,3 +79,11 @@ void	IRCServer::c_oper(IRCUser &user, const IRCMessage &msg, IRCChannel &target)
 	if(!reply.empty())
 		user.queueSend(reply.c_str(), reply.size());
 }
+
+void	IRCServer::c_banned(IRCUser &user, const IRCMessage &msg, IRCChannel &target)
+{
+	std::string	reply;
+
+	if(!reply.empty())
+		user.queueSend(reply.c_str(), reply.size());
+}

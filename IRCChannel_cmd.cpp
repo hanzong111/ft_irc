@@ -162,6 +162,8 @@ void	IRCServer::C_handleMODE(IRCUser &user, const IRCMessage &msg)
 					c_limit(user, msg, channel_it->second);
 				else if(flag_requested & C_OPER)
 					c_oper(user, msg, channel_it->second);
+				else if(flag_requested & C_BANNED)
+					c_banned(user, msg, channel_it->second);
 			}
 		}
 		else if(msg.params[1][0] == '-')
