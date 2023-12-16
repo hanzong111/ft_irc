@@ -225,14 +225,14 @@ void	IRCServer::S_handleQUIT(IRCUser &user, const IRCMessage &msg)
 	std::string	reply;
 
 	if (msg.params.size() >= 1)
-		reply = ":" + user.getNickname() + "ERROR :" + msg.params[1] + "\r\n";
-	else
-		reply = ":" + user.getNickname() + "ERROR :\r\n";
-	if (!reply.empty())
 	{
-		user.queueSend(reply.c_str(), reply.size());
-		return ;
+		std::cout << msg.params[0] << std::endl;
+		reply = ":" + user.getNickname() + " ERROR :" + msg.params[0] + "\r\n";
 	}
+	else
+		reply = ":" + user.getNickname() + " ERROR\r\n";
+	if (!reply.empty())
+		user.queueSend(reply.c_str(), reply.size());
 	ind = users_map.at(user.getNickname());
 	users_map.erase(clients[ind].getNickname());
 	removeClient(clients[ind]);
