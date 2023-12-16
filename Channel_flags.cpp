@@ -92,6 +92,17 @@ void	IRCServer::c_banned(IRCUser &user, const IRCMessage &msg, IRCChannel &targe
 	{
 		target.banUser(msg.params[2]);
 		std::cout << GREEN << target.getName() + ": User is being added into ban list" << DEF_COLOR << std::endl;
+		if(target.isUserInChannel(msg.params[2]))
+		{
+			reply = ":" + user.getNickname() + " KICK " + target.getName() + " " + msg.params[2] + " " + user.getNickname() + "\r\n";
+			broadcastToChannel(target.getName(), reply);
+			reply.clear();
+			target.removeUser(msg.params[2]);
+			if(target.isUserOper(msg.params[2]))
+				target.removeOper(msg.params[2]);
+			if(target.isUserMuted(msg.params[2]))
+				target.removeMutedUser(msg.params[2]);
+		}
 	}
 	if(!reply.empty())
 		user.queueSend(reply.c_str(), reply.size());
