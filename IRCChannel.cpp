@@ -335,3 +335,8 @@ void	IRCChannel::removeMutedUser(const std::string &nickname)
 {
 	muted_users.erase(nickname);
 }
+
+void	IRCChannel::removeCreator()
+{
+	creator.clear();
+}

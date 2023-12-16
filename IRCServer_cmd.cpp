@@ -58,6 +58,48 @@ void	IRCServer::S_handleNICK(IRCUser &user, const IRCMessage &msg)
 	// Update IRCUser object
 	std::string old_nickname = user.getNickname();
 	user.changeNickname(msg.params[0]);
+
+	std::map<std::string, IRCChannel>::iterator		it;
+	for(it = channels.begin(); it != channels.end(); it++)
+	{
+		if(it->second.isUserInChannel(old_nickname))
+		{
+			it->second.removeUser(old_nickname);
+			it->second.addUser(user.getNickname());
+			if(it->second.isUserOper(old_nickname))
+			{
+				it->second.removeOper(old_nickname);
+				it->second.addOper(user.getNickname());
+			}
+			if(it->second.isUserMuted(old_nickname))
+			{
+				it->second.removeMutedUser(old_nickname);
+				it->second.muteUser(user.getNickname());
+			}
+			if(it->second.isUserBanned(old_nickname))
+			{
+				it->second.removeBannedUser(old_nickname);
+				it->second.banUser(user.getNickname());
+			}
+			if(it->second.isUserCreator(old_nickname))
+			{
+				it->second.removeCreator();
+				it->second.setCreator(user.getNickname());
+			}
+			std::set<std::string>						user_list;
+			std::set<std::string>::iterator				list_it;
+			std::string									user_str;
+
+			user_list = it->second.getUsers();
+			for(list_it = user_list.begin();list_it != user_list.end(); ++list_it)
+			{
+				user_str += *list_it;
+				user_str += " ";
+			}
+			reply = RPL_NAMREPLY(servername, user.getNickname(),"=", it->second.getName(), user_str);
+			user.queueSend(reply.c_str(), reply.size());
+		}
+	}
 	// Update `users_map`
 	size_t ind = users_map[old_nickname];
 	users_map.erase(old_nickname);

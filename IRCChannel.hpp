@@ -45,29 +45,36 @@ class IRCChannel
 
 		const std::string	&getName() const throw();
 		const UsersList		&getUsers() const throw();
-		std::string			getUsersAsStr(char separator) const throw();
 		const std::string	&getModestr();
 		const std::string	&getKey();
 		IRCChannelModesMap 	&getFlag_map();
-		void				addUser(const std::string &nickname);
-		void				removeUser(const std::string &nickname);
-		void				muteUser(const std::string &nickname);
-		void				banUser(const std::string &nickname);
+		const	std::string	&getCreator() const throw();
 		const std::string	getTopic() const throw();
-		void				setTopic(const std::string &topic_str);
-		int					getModeFlags();
-		void				setModeFlag(int flag);
-		void				clearModeFlag(int flag);
-		void				setCreator(const std::string &user);
-		void				addOper(const std::string &nickname);
-		void				removeOper(const std::string &nickname);
-		void				setLimit(int value);
 		int					getLimit() const throw();
-		void				clearLimit();
-		void				setKey(const std::string &key);
-		void				removeKey();
 		size_t				getNumUsers() const throw();
 		int					getintNumUsers() const throw();
+		std::string			getUsersAsStr(char separator) const throw();
+		int					getModeFlags();
+
+		void				banUser(const std::string &nickname);
+		void				muteUser(const std::string &nickname);
+		void				addOper(const std::string &nickname);
+		void				addUser(const std::string &nickname);
+		void				setTopic(const std::string &topic_str);
+		void				setModeFlag(int flag);
+		void				setCreator(const std::string &user);
+		void				setLimit(int value);
+		void				setKey(const std::string &key);
+
+		void				clearModeFlag(int flag);
+		void				clearLimit();
+		void				removeUser(const std::string &nickname);
+		void				removeKey();
+		void				removeOper(const std::string &nickname);
+		void				removeBannedUser(const std::string &nickname);
+		void				removeMutedUser(const std::string &nickname);
+		void				removeCreator();
+
 		
 		bool				isTopicset() const throw();
 		bool				isUserBanned(const std::string &nickname) const throw();
@@ -79,9 +86,6 @@ class IRCChannel
 		bool				isUserCreator(const std::string &nickname) const throw();
 		void				print_opers();
 		void				print_users();
-		const	std::string	&getCreator() const throw();
-		void				removeBannedUser(const std::string &nickname);
-		void				removeMutedUser(const std::string &nickname);
 
 	private:
 		// Class contains const member, should not be assignable. 
