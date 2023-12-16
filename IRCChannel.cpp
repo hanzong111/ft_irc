@@ -298,3 +298,8 @@ const std::string	&IRCChannel::getCreator() const throw()
 {
 	return(creator);
 }
+
+size_t	IRCChannel::getNumUsers() const throw()
+{
+	return (users.size());
+}
