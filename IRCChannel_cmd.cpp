@@ -171,16 +171,24 @@ void	IRCServer::C_handleMODE(IRCUser &user, const IRCMessage &msg)
 		}
 		else if(msg.params[1][0] == '-')
 		{
-			if(flag_requested & C_KEY)
-				channel_it->second.removeKey();
-			else if(flag_requested & C_LIMIT)
-				channel_it->second.clearLimit();
-			else if(flag_requested & C_OPER)
-				channel_it->second.removeOper(user.getNickname());
-			else if(flag_requested & C_BANNED)
-				c_unban(user, msg, channel_it->second);
-			else if(flag_requested & C_MUTED)
-				c_unmute(user, msg, channel_it->second);
+			if(!channel_it->second.isUserOper(user.getNickname()))
+			{
+				reply = ERR_CHANOPRIVSNEEDED(servername, user.getNickname(), channel_it->second.getName());
+				std::cout << RED << channel_it->second.getName() + ": User is not an Operator!" << DEF_COLOR << std::endl;
+			}
+			else
+			{
+				if(flag_requested & C_KEY)
+					channel_it->second.removeKey();
+				else if(flag_requested & C_LIMIT)
+					channel_it->second.clearLimit();
+				else if(flag_requested & C_OPER)
+					channel_it->second.removeOper(user.getNickname());
+				else if(flag_requested & C_BANNED)
+					c_unban(user, msg, channel_it->second);
+				else if(flag_requested & C_MUTED)
+					c_unmute(user, msg, channel_it->second);
+			}
 		}
 	}
 	if(!reply.empty())
