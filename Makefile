@@ -44,10 +44,10 @@ fclean:clean
 
 re:fclean all
 
-$(BOT_NAME): $(DIR_OBJ) $(BOT_OBJ)
+$(BOT_NAME): $(BOT_OBJ)
 	$(CXX) -o $@ $(BOT_OBJ) $(CXX_FLAGS)
 
-$(NAME): $(DIR_OBJ) $(SERVER_OBJ)
+$(NAME): $(SERVER_OBJ)
 	$(CXX) -o $@ $(SERVER_OBJ) $(CXX_FLAGS)
 
 $(SERVER_OBJ): | $(DIR_OBJ)
