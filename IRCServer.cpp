@@ -137,6 +137,8 @@ size_t	IRCServer::handlePollIn(size_t ind)
 			buf[n_bytes_recv] = '\0';
 
 			processCommands(clients[ind], std::string(buf));
+			if (std::string(buf).substr(0, 4) == "QUIT")
+				return (ind - !(ind == 0));
 			n_bytes_recv = clients[ind].checkRecvBuf("\r\n", 2);
 		} while (n_bytes_recv > 0);
 	}
@@ -147,7 +149,7 @@ size_t	IRCServer::handlePollIn(size_t ind)
 		users_map.erase(clients[ind].getNickname());
 		removeClient(clients[ind]);
 		updateUsersMap();
-		return (ind - 1);
+		return (ind - !(ind == 0));
 	}
 	return (ind);
 }
