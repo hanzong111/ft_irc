@@ -25,10 +25,10 @@ BOT_SRC_FILES := 	irc_bot.cpp \
 					IRCBot.cpp
 BOT_SRC_FILES += $(SHARED_SRC_FILES)
 
-SERVER_SRC := $(addprefix $(DIR_SRC)/, SERVER_SRC_FILES)
+SERVER_SRC := $(addprefix $(DIR_SRC)/, $(SERVER_SRC_FILES))
 SERVER_OBJ := $(addprefix $(DIR_OBJ)/, $(patsubst %.cpp, %.o, $(SERVER_SRC_FILES)))
 
-BOT_SRC := $(addprefix $(DIR_SRC)/, BOT_SRC_FILES)
+BOT_SRC := $(addprefix $(DIR_SRC)/, $(BOT_SRC_FILES))
 BOT_OBJ := $(addprefix $(DIR_OBJ)/, $(patsubst %.cpp, %.o, $(BOT_SRC_FILES)))
 
 all: $(NAME) $(BOT_NAME)
@@ -40,7 +40,7 @@ clean:
 
 fclean:clean
 	@rm -f $(NAME)
-	@rm -f irc_bot
+	@rm -f $(BOT_NAME)
 
 re:fclean all
 
